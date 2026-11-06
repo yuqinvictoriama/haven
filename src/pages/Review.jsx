@@ -171,9 +171,9 @@ export default function Review() {
         <div className="card" style={{ background: 'var(--danger-soft)', borderColor: 'transparent' }}>
           <h3 style={{ color: 'var(--danger)' }}>{SAFETY_CARD.title}</h3>
           <p className="small" style={{ margin: '6px 0 10px' }}>{err ? SAFETY_CARD.fallbackIntro : SAFETY_CARD.intro}</p>
-          <div className="btn-row">
-            <a className="btn" href={HOTLINE.tel} style={{ background: 'var(--surface)' }}><Phone /> {HOTLINE.name}: {HOTLINE.phone}</a>
-            <a className="btn" href={DANGER_NOW.tel} style={{ background: 'var(--surface)' }}>{DANGER_NOW.text}</a>
+          <div className="stack">
+            <a className="btn btn-block" href={HOTLINE.tel} style={{ background: 'var(--surface)', whiteSpace: 'normal', textAlign: 'center' }}><Phone /> {HOTLINE.name}: {HOTLINE.phone}</a>
+            <a className="btn btn-block" href={DANGER_NOW.tel} style={{ background: 'var(--surface)', whiteSpace: 'normal', textAlign: 'center' }}>{DANGER_NOW.text}</a>
           </div>
         </div>
       )}
