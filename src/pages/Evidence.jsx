@@ -3,7 +3,7 @@ import { useRoute, navigate } from '../lib/router.js'
 import { db, newItem, kindForFile, KINDS } from '../lib/db.js'
 import { readText, fmtDate } from '../lib/media.js'
 import { analyze } from '../lib/api.js'
-import { Upload, Msg, ChevR, Folder, Alert, Spark, Img, kindIcon } from '../components/Icons.jsx'
+import { Upload, ChevR, Folder, Alert, Spark, Img, Camera, Mic, Note, kindIcon } from '../components/Icons.jsx'
 
 const SCREENSHOT_TYPES = 'image/png,image/jpeg,image/webp,image/gif'
 const MAX_SIDE = 1600
@@ -43,12 +43,15 @@ export default function Evidence() {
   const [shotMsg, setShotMsg] = useState('')
   const fileRef = useRef(null)
   const shotRef = useRef(null)
+  const photoRef = useRef(null)
+  const recordingRef = useRef(null)
   const highlightUpload = query.get('upload') === '1'
 
   const load = () => db.all().then(setItems).catch((e) => setErr(String(e?.message || e)))
   useEffect(() => { load() }, [])
 
-  const onFiles = async (e) => {
+  // Saves picked files as evidence. "Upload photo" passes kind 'photo'; other buttons let the file type decide.
+  const onFiles = (forcedKind) => async (e) => {
     const files = Array.from(e.target.files || [])
     e.target.value = ''
     if (!files.length) return
@@ -56,7 +59,7 @@ export default function Evidence() {
     setErr('')
     try {
       for (const f of files) {
-        const kind = kindForFile(f)
+        const kind = forcedKind || kindForFile(f)
         const textLike = kind === 'text' || kind === 'log'
         let text = null
         if (textLike) {
@@ -163,14 +166,40 @@ export default function Evidence() {
 
   return (
     <>
-      <button className="btn btn-primary btn-block" onClick={() => shotRef.current?.click()} disabled={busy || !!reading}><Img /> Add screenshots of messages</button>
-      <input ref={shotRef} className="file-hidden" type="file" multiple accept={SCREENSHOT_TYPES} onChange={onScreenshots} />
-      <div className="btn-row">
-        <button className={'btn ' + (highlightUpload ? 'btn-primary' : 'btn-secondary')} onClick={() => fileRef.current?.click()} disabled={busy}><Upload /> {busy ? 'Adding…' : 'Upload files'}</button>
-        <button className="btn btn-outline" onClick={() => navigate('/analyze')}><Msg /> Paste texts</button>
-        <button className="btn btn-outline" onClick={() => navigate('/review')}><Spark /> Review notes</button>
+      <div className="section-title">Add evidence</div>
+      <div className="grid-2">
+        <button className="action-tile" onClick={() => photoRef.current?.click()} disabled={busy || !!reading}>
+          <span className="ico"><Camera /></span>
+          <span className="label">Upload photo</span>
+          <span className="desc">Injuries, damage, places</span>
+        </button>
+        <button className="action-tile" onClick={() => recordingRef.current?.click()} disabled={busy || !!reading}>
+          <span className="ico"><Mic /></span>
+          <span className="label">Upload recording</span>
+          <span className="desc">Voice memos or videos</span>
+        </button>
+        <button className="action-tile" onClick={() => shotRef.current?.click()} disabled={busy || !!reading}>
+          <span className="ico yellow"><Img /></span>
+          <span className="label">Upload screenshot</span>
+          <span className="desc">Messages; Claude reads them</span>
+        </button>
+        <button className="action-tile" onClick={() => navigate('/analyze')}>
+          <span className="ico yellow"><Note /></span>
+          <span className="label">Add log</span>
+          <span className="desc">Type what happened or paste texts</span>
+        </button>
       </div>
-      <input ref={fileRef} className="file-hidden" type="file" multiple accept="image/*,audio/*,video/*,text/*,.txt,.log,.csv,.json,.md,.eml,.pdf" onChange={onFiles} />
+      <button className="btn btn-ghost btn-sm" onClick={() => fileRef.current?.click()} disabled={busy}><Upload /> {busy ? 'Adding…' : 'Other file (PDF, email, chat export…)'}</button>
+      <input ref={photoRef} className="file-hidden" type="file" multiple accept="image/*" onChange={onFiles('photo')} />
+      <input ref={recordingRef} className="file-hidden" type="file" multiple accept="audio/*,video/*" onChange={onFiles(null)} />
+      <input ref={shotRef} className="file-hidden" type="file" multiple accept={SCREENSHOT_TYPES} onChange={onScreenshots} />
+      <input ref={fileRef} className="file-hidden" type="file" multiple accept="image/*,audio/*,video/*,text/*,.txt,.log,.csv,.json,.md,.eml,.pdf" onChange={onFiles(null)} />
+
+      <div className="card" style={{ background: 'var(--purple-soft)', borderColor: 'transparent' }}>
+        <h3>See the patterns over time</h3>
+        <p className="small" style={{ margin: '4px 0 10px' }}>Claude reviews all your evidence together and shows what keeps happening, and how it has changed.</p>
+        <button className="btn btn-primary btn-block" onClick={() => navigate('/review')}><Spark /> Review notes</button>
+      </div>
       {highlightUpload && <div className="notice purple">Screenshots, chat exports, call logs, photos, voice memos, and videos all work. Files keep their original date.</div>}
       {reading && <div className="notice purple"><span className="spinner" />{reading}</div>}
       {shotMsg && <div className="notice warn"><Alert />{shotMsg}</div>}
