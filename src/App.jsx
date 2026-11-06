@@ -109,7 +109,7 @@ export default function App() {
             <button className="icon-btn" aria-label="Back" onClick={() => back(fallback)}><Back /></button>
           ) : null}
           <div className="title">
-            {title ? <span>{title}</span> : <span className="wordmark"><i className="dot" />Haven</span>}
+            {title ? <span>{title}</span> : <span className="wordmark"><img className="logo" src="/logo.png" alt="" />Haven</span>}
           </div>
           <button className="btn btn-exit no-print" onClick={quickExit} title="Leave this site immediately"><Exit /> Exit</button>
         </header>

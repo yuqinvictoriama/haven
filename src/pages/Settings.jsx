@@ -157,7 +157,8 @@ export default function Settings() {
         <button className="btn btn-ghost btn-sm" onClick={() => { setSettings({ installDismissed: false }); navigate('/') }}>Show the install banner again</button>
       </div>
 
-      <div className="tiny" style={{ textAlign: 'center', padding: '8px 0 20px' }}>Haven · prototype · not legal advice · {status.commit ? `build ${status.commit}` : ''}</div>
+      <img className="about-logo" src="/logo.png" alt="Haven logo" />
+      <div className="tiny" style={{ textAlign: 'center', padding: '0 0 20px' }}>Haven · prototype · not legal advice · {status.commit ? `build ${status.commit}` : ''}</div>
 
       <Sheet open={confirmWipe} onClose={() => setConfirmWipe(false)} title="Delete everything?">
         <p className="muted">All evidence, drafts, and settings on this phone will be erased. This cannot be undone.</p>

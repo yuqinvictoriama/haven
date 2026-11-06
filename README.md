@@ -1,5 +1,7 @@
 # Haven
 
+<img src="logo/logo.png" alt="Haven logo: a purple bird" width="120">
+
 Haven is an installable progressive web app for people experiencing domestic violence: capture evidence discreetly on a phone, keep it on the device, and turn it into the documents an advocate, a court, or the police need. Live at https://haven-app-ochre.vercel.app.
 
 **Disguise (home screen only).** On the phone the app installs as **Convert** with a ruler icon, so the home screen doesn't give it away. Opening it goes straight into Haven; there is no converter screen inside the app. The Exit button leaves for a neutral site (Google by default; changeable in Settings).
