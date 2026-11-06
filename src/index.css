@@ -278,3 +278,21 @@ audio { width: 100%; }
   .doc { border: 0; box-shadow: none; padding: 0; }
   body { background: #fff; color: #000; }
 }
+
+/* Document paths (Documents page): numbered steps for each path */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; gap: 10px; align-items: stretch; }
+.step-num { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--purple-soft); color: var(--purple-ink); font-weight: 700; font-size: 0.8rem; display: grid; place-items: center; margin-top: 12px; }
+.step-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 12px 14px; text-align: left; color: inherit; font: inherit; }
+.step-doc { cursor: pointer; box-shadow: var(--shadow); }
+.step-doc:hover { background: var(--surface-2); }
+.step-doc:active { transform: scale(0.99); }
+.step-title { display: flex; align-items: center; gap: 8px; font-weight: 650; flex-wrap: wrap; }
+.step-title .ico { width: 30px; height: 30px; border-radius: 8px; background: var(--purple-soft); color: var(--purple-ink); display: grid; place-items: center; flex: none; }
+.step-title .ico svg { width: 17px; height: 17px; }
+.step-title > svg { width: 18px; height: 18px; color: var(--text-3); flex: none; }
+.step-desc { font-size: 0.85rem; color: var(--text-2); }
+.step-why { font-size: 0.82rem; color: var(--purple-ink); }
+.step.info .step-body { background: var(--surface-2); border-style: dashed; box-shadow: none; }
+.step.info .step-num { background: var(--surface-2); color: var(--text-3); border: 1px solid var(--border); }
+.step.info .step-desc { color: var(--text-2); }
