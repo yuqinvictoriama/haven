@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { db, loadSettings } from '../lib/db.js'
-import { fmtDay } from '../lib/media.js'
+import { fmtDate, fmtDay } from '../lib/media.js'
 import { sampleEntries } from '../data/sampleEntries.js'
 import { HOTLINE, DANGER_NOW, LEGAL_DISCLAIMER, SAFETY_CARD, NEXT_STEPS } from '../content/safetyText.js'
 import { navigate } from '../lib/router.js'
@@ -46,43 +46,69 @@ function monthByMonth(entries, categories) {
   return [...months.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
 }
 
+// The latest review is kept on this device in the documents store, so "Delete all" in Settings erases it too.
+const SAVED_REVIEW_ID = 'review-latest'
+
+// Same items with the same text? Used to tell her when her evidence changed after the last review.
+function sameEntries(a, b) {
+  const key = (list) => JSON.stringify((list || []).map((e) => [e.id, e.text]))
+  return key(a) === key(b)
+}
+
 // Reviews all saved evidence with /api/analyze: categories per entry, safety flags,
 // a short summary, and the patterns over time that can be hard to see one day at a time.
 export default function Review() {
-  const [entries, setEntries] = useState(null)
+  const [current, setCurrent] = useState(null) // her saved evidence right now, as entries
   const [sample, setSample] = useState(false)
-  const [result, setResult] = useState(null)
+  const [review, setReview] = useState(null) // the last review, saved on this device: { entries, result, sample, createdAt }
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
 
   useEffect(() => {
-    db.all().then((all) => {
+    Promise.all([db.all(), db.getDoc(SAVED_REVIEW_ID).catch(() => null)]).then(([all, saved]) => {
       const usable = all.filter((it) => entryText(it)).sort((a, b) => (a.capturedAt < b.capturedAt ? -1 : 1))
-      setEntries(usable.map((it, i) => ({ n: i + 1, date: localDay(it.capturedAt), kind: it.kind, text: entryText(it).slice(0, 4000), id: it.id })))
+      setCurrent(usable.map((it, i) => ({ n: i + 1, date: localDay(it.capturedAt), kind: it.kind, text: entryText(it).slice(0, 4000), id: it.id })))
+      if (saved?.result) {
+        setReview(saved)
+        setSample(!!saved.sample)
+      }
     })
   }, [])
 
+  const toReview = sample ? sampleEntries : current
+  // A saved review shows the entries it was based on, so entry numbers always match its results.
+  const entries = review ? review.entries : toReview
+  const result = review?.result
+  const outdated = review && !review.sample && !sameEntries(review.entries, current)
+
   const useSample = () => {
     setSample(true)
-    setResult(null)
+    setReview(null)
     setErr('')
-    setEntries(sampleEntries.map((e) => ({ ...e })))
+  }
+
+  const useMine = () => {
+    setSample(false)
+    setReview(null)
+    setErr('')
   }
 
   const run = async () => {
-    if (!entries?.length) return
+    if (!toReview?.length) return
     setBusy(true)
     setErr('')
-    setResult(null)
     try {
       const headers = { 'Content-Type': 'application/json' }
       const key = loadSettings().apiKey?.trim()
       if (key) headers['x-haven-key'] = key
-      const r = await fetch('/api/analyze', { method: 'POST', headers, body: JSON.stringify({ entries: entries.map(({ n, date, kind, text }) => ({ n, date, kind: kind || 'note', text })) }) })
+      const r = await fetch('/api/analyze', { method: 'POST', headers, body: JSON.stringify({ entries: toReview.map(({ n, date, kind, text }) => ({ n, date, kind: kind || 'note', text })) }) })
       const j = await r.json().catch(() => ({}))
       if (!r.ok) throw new Error(j.error || j.message || `Request failed (${r.status})`)
-      setResult(j)
+      const saved = { id: SAVED_REVIEW_ID, kind: 'review', title: 'Review notes', createdAt: new Date().toISOString(), sample, entries: toReview, result: j }
+      await db.putDoc(saved).catch((e) => console.error('Could not save the review on this device', e))
+      setReview(saved)
     } catch (e) {
+      console.error('Review failed', e)
       setErr(e?.message || String(e))
     } finally {
       setBusy(false)
@@ -112,9 +138,12 @@ export default function Review() {
       ) : (
         <>
           <div className="row between">
-            <span className="small muted">{entries.length} entr{entries.length === 1 ? 'y' : 'ies'}{sample ? ' · sample data (Serena and Marcus are made up)' : ''}</span>
-            {!sample && <button className="btn btn-ghost btn-sm" onClick={useSample}>Use sample instead</button>}
+            <span className="small muted">{entries.length} entr{entries.length === 1 ? 'y' : 'ies'}{sample ? ' · sample data (Serena and Marcus are made up)' : ''}{review ? ` · reviewed ${fmtDate(review.createdAt)}` : ''}</span>
+            {sample
+              ? current?.length > 0 && <button className="btn btn-ghost btn-sm" onClick={useMine}>Use my evidence</button>
+              : <button className="btn btn-ghost btn-sm" onClick={useSample}>Use sample instead</button>}
           </div>
+          {outdated && <div className="notice warn"><Alert />Your evidence has changed since this review. Tap Review again to include the latest.</div>}
           <div className="list">
             {entries.map((e) => {
               const labels = labelsFor(e.n)
@@ -132,8 +161,8 @@ export default function Review() {
               )
             })}
           </div>
-          <button className="btn btn-primary btn-lg btn-block" onClick={run} disabled={busy}>
-            {busy ? <><span className="spinner" /> Reviewing with Claude…</> : <><Spark /> Review with Claude</>}
+          <button className="btn btn-primary btn-lg btn-block" onClick={run} disabled={busy || !toReview?.length}>
+            {busy ? <><span className="spinner" /> Reviewing with Claude…</> : <><Spark /> {review ? 'Review again' : 'Review with Claude'}</>}
           </button>
         </>
       )}
