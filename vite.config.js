@@ -11,9 +11,10 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icon.svg'],
       manifest: {
         id: '/',
-        name: 'Haven',
-        short_name: 'Haven',
-        description: 'Private evidence journal: record, organize, and turn evidence into documents.',
+        // Disguise: the installed app is a unit converter named "Convert" with a ruler icon.
+        name: 'Convert',
+        short_name: 'Convert',
+        description: 'Quick unit converter for length, weight, temperature, and volume.',
         theme_color: '#faf7ee',
         background_color: '#faf7ee',
         display: 'standalone',
@@ -21,16 +22,18 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         lang: 'en',
-        categories: ['utilities', 'productivity'],
+        categories: ['utilities'],
         icons: [
           { src: '/pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: '/pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
           { src: '/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
+        // Icon shortcuts must not give the app away, so they only open converter categories.
+        // Direct capture links (/capture?mode=audio&auto=1) still work from a Back Tap / Quick Tap shortcut.
         shortcuts: [
-          { name: 'Record audio', short_name: 'Record', url: '/capture?mode=audio&auto=1', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
-          { name: 'Take photo', short_name: 'Photo', url: '/capture?mode=photo', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
-          { name: 'New note', short_name: 'Note', url: '/capture?mode=note', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+          { name: 'Length', short_name: 'Length', url: '/?c=length', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+          { name: 'Weight', short_name: 'Weight', url: '/?c=weight', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+          { name: 'Temperature', short_name: 'Temp', url: '/?c=temperature', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
         ],
         // Share text from another app (Android/Chrome) straight into Analyze.
         share_target: { action: '/share', method: 'GET', params: { title: 'title', text: 'text', url: 'url' } },

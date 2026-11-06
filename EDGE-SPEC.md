@@ -189,6 +189,14 @@ What a Capacitor (native shell) build would unlock:
 
 ## Safety notes
 
+Implemented disguise (added after the first draft of this spec): the installed app is named
+"Convert" with a ruler icon and is a working unit converter. Holding "=" for two seconds
+opens Haven; Exit returns to the converter; the address bar always shows "/". Manifest icon
+shortcuts open only converter categories so a long-press reveals nothing. Direct links such as
+`/capture?mode=audio&auto=1` still open the recorder for Back Tap / Quick Tap shortcuts and are
+rewritten to "/" on load, so the shortcut's URL is the only place the vault is visible.
+
+
 - Name and icon: on iOS the user can rename the icon in the Add to Home Screen sheet
   (icon stays Haven's); on Android the WebAPK name and icon come from the manifest.
   Consider serving an alternate "neutral" manifest (name and icon) from a second install

@@ -30,8 +30,8 @@ export default function Home() {
         <div className="card purple card-tight row">
           <Install style={{ width: 22, height: 22, color: 'var(--purple-ink)', flex: 'none' }} />
           <div className="grow">
-            <div style={{ fontWeight: 650, color: 'var(--purple-ink)' }}>Install Haven on your phone</div>
-            <div className="small" style={{ color: 'var(--purple-ink)', opacity: 0.85 }}>Adds the app to your home screen so you can open it in one tap.</div>
+            <div style={{ fontWeight: 650, color: 'var(--purple-ink)' }}>Install on your phone</div>
+            <div className="small" style={{ color: 'var(--purple-ink)', opacity: 0.85 }}>It appears on your home screen as “Convert” with a ruler icon.</div>
           </div>
           <button className="btn btn-sm" style={{ background: 'var(--surface)', color: 'var(--purple-ink)' }} onClick={install}>How</button>
           <button className="icon-btn" aria-label="Dismiss" onClick={() => setSettings({ installDismissed: true })}><X /></button>
@@ -109,19 +109,19 @@ export default function Home() {
         Claude: {claudeMode === 'live' ? 'connected' : claudeMode === 'key' ? 'using your key' : 'demo mode'} · <a href="/settings" onClick={(e) => { e.preventDefault(); navigate('/settings') }}>settings</a>
       </div>
 
-      <Sheet open={showInstall} onClose={() => setShowInstall(false)} title="Add Haven to your home screen">
+      <Sheet open={showInstall} onClose={() => setShowInstall(false)} title="Add Convert to your home screen">
         {isIOS ? (
           <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.6 }}>
             <li>Open this page in <b>Safari</b> (required on iPhone).</li>
             <li>Tap the <b>Share</b> button (square with an arrow).</li>
             <li>Scroll and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
-            <li>Open Haven from your home screen. It runs full screen like an app.</li>
+            <li>Open “Convert” from your home screen, then hold <b>=</b> for two seconds to get back here.</li>
           </ol>
         ) : (
           <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.6 }}>
             <li>Open this page in <b>Chrome</b>.</li>
             <li>Tap the <b>⋮</b> menu, then <b>Add to Home screen</b> or <b>Install app</b>.</li>
-            <li>Confirm. Haven appears with your other apps.</li>
+            <li>Confirm. “Convert” appears with your other apps; hold <b>=</b> for two seconds to get back here.</li>
           </ol>
         )}
         <button className="btn btn-primary btn-block" onClick={() => setShowInstall(false)}>Done</button>
