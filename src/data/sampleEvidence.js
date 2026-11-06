@@ -1,33 +1,67 @@
 // Load or remove made-up sample evidence (Serena and Marcus are not real people).
-// The 12 sample entries become notes, plus four placeholder media items that
-// match those entries and add no new events.
+// The 12 sample entries become notes, plus four media items: two real sample
+// images from public/sample (a text thread and a bruise) and two placeholders
+// (a photo and a voice memo) that match the entries.
+// Titles read like something Serena would write, with "(sample)" at the end.
 import { db, newItem } from '../lib/db.js'
 import { sampleEntries } from './sampleEntries.js'
 
+// Short titles for the 12 sample notes, by entry number.
+const NOTE_TITLES = {
+  1: 'Marcus read my texts with my sister',
+  2: 'Had to move my direct deposit to his account',
+  3: "Missed my sister's birthday dinner",
+  4: 'My car keys were in his jacket',
+  5: 'Tracking app on my phone',
+  6: 'Hole punched in the kitchen wall',
+  7: 'Shoved into the door frame',
+  8: 'Asked for $20 for groceries',
+  9: "Grabbed by the neck, couldn't breathe",
+  10: 'Blocked the door and took my phone',
+  11: 'Bruises on my arm',
+  12: 'Bank password changed',
+}
+
 const SAMPLE_MEDIA = [
+  {
+    kind: 'screenshot',
+    file: 'texts.png',
+    date: '2026-10-26',
+    time: '11:47:00',
+    title: 'Texts from Marcus threatening to break my door (sample)',
+    text: [
+      "Marcus (11:46 AM): if you dont talk to me rn, i'm going to break ur door",
+      "Marcus (11:46 AM): i'm telling u",
+      'Marcus (11:47 AM): i will do it',
+      "Marcus (11:47 AM): don't tempt me",
+      "Me (11:47 AM): wait i'm sorry",
+      'Me (11:47 AM): can we talk tomorrow',
+      "Marcus (11:47 AM): serena don't play with me",
+      "Marcus (11:47 AM): i don't want to talk to u",
+      "Me (11:47 AM): i'm calling the police",
+      'Marcus (11:47 AM): its not or never',
+      "Marcus (11:47 AM): don't threaten me",
+    ].join('\n'),
+    notes: 'Screenshot of texts from Marcus the morning after I stayed at my sister\'s. He said he would break my door if I did not talk to him.',
+  },
+  {
+    kind: 'photo',
+    file: 'bruise-on-arm.png',
+    date: '2026-10-29',
+    time: '15:10:00',
+    title: 'Photo of the bruise on my arm (sample)',
+    notes: 'Photo of my arm the evening Marcus grabbed it because I did not answer his text fast enough at work.',
+  },
   {
     kind: 'photo',
     date: '2026-10-09',
-    title: 'Sample: Photo of the kitchen wall',
+    title: 'Photo of the hole in the kitchen wall (sample)',
     notes: 'Placeholder photo (sample): the hole Marcus punched in the kitchen wall.',
-  },
-  {
-    kind: 'photo',
-    date: '2026-10-29',
-    title: 'Sample: Photo of bruises on my arm',
-    notes: 'Placeholder photo (sample): bruises on my arm where Marcus grabbed it.',
-  },
-  {
-    kind: 'screenshot',
-    date: '2026-10-05',
-    title: 'Sample: Screenshot of a text from Marcus',
-    text: 'Marcus: why are you at the store so long',
-    notes: 'Placeholder screenshot (sample) of a text message from Marcus.',
   },
   {
     kind: 'audio',
     date: '2026-10-17',
-    title: 'Sample: Voice memo about grocery money',
+    title: 'Voice memo of the argument about grocery money (sample)',
     notes: "Placeholder voice memo (sample): the argument about $20 for groceries. Marcus said it's his money now, and that I'd regret it when I said I'd open my own account.",
   },
 ]
@@ -98,15 +132,23 @@ export function silentWav() {
   return bytes
 }
 
-function mediaItem(m) {
-  const blob =
-    m.kind === 'audio'
-      ? new Blob([silentWav()], { type: 'audio/wav' })
-      : new Blob([placeholderSvg(m.notes)], { type: 'image/svg+xml' })
+// Real sample images live in public/sample; the other items get a placeholder.
+async function mediaBlob(m) {
+  if (m.file) {
+    const res = await fetch(`/sample/${m.file}`)
+    if (!res.ok) throw new Error(`Could not load sample image ${m.file} (${res.status})`)
+    return res.blob()
+  }
+  if (m.kind === 'audio') return new Blob([silentWav()], { type: 'audio/wav' })
+  return new Blob([placeholderSvg(m.notes)], { type: 'image/svg+xml' })
+}
+
+async function mediaItem(m) {
+  const blob = await mediaBlob(m)
   return newItem({
     kind: m.kind,
     title: m.title,
-    capturedAt: localIso(m.date, '12:30:00'),
+    capturedAt: localIso(m.date, m.time || '12:30:00'),
     mime: blob.type,
     size: blob.size,
     blob,
@@ -118,25 +160,26 @@ function mediaItem(m) {
   })
 }
 
-export function buildSampleItems() {
+export async function buildSampleItems() {
   const notes = sampleEntries.map((e) =>
     newItem({
       kind: 'note',
-      title: `Sample: Note ${e.n}`,
+      title: `${NOTE_TITLES[e.n] || `Note ${e.n}`} (sample)`,
       capturedAt: localIso(e.date, '12:00:00'),
       text: e.text,
       tags: ['sample'],
       source: 'sample',
     }),
   )
-  return [...notes, ...SAMPLE_MEDIA.map(mediaItem)]
+  const media = await Promise.all(SAMPLE_MEDIA.map(mediaItem))
+  return [...notes, ...media]
 }
 
 // Adds the sample items unless they are already there. Returns how many were added.
 export async function loadSampleEvidence() {
   const existing = await db.all()
   if (existing.some(isSampleItem)) return 0
-  const items = buildSampleItems()
+  const items = await buildSampleItems()
   for (const item of items) await db.put(item)
   return items.length
 }
