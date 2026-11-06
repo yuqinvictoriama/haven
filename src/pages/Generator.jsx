@@ -4,6 +4,7 @@ import { db, uid } from '../lib/db.js'
 import { fmtDate, download } from '../lib/media.js'
 import { generate, isNoKey } from '../lib/api.js'
 import { DOC_KINDS, demoDocument } from '../lib/demo.js'
+import { pathsFor } from '../content/paths.js'
 import { renderMarkdown } from '../lib/markdown.js'
 import { useApp } from '../App.jsx'
 import { LEGAL_DISCLAIMER, NEXT_STEPS } from '../content/safetyText.js'
@@ -140,6 +141,11 @@ export default function Generator({ kind }) {
             <div>
               <h2>{meta.title}</h2>
               <p className="muted small" style={{ marginTop: 4 }}>{meta.desc}</p>
+              {pathsFor(kind).length > 0 && (
+                <div className="chips" style={{ marginTop: 8 }}>
+                  {pathsFor(kind).map((p) => <span key={p.id} className="badge purple">{p.title} path · step {p.step}</span>)}
+                </div>
+              )}
               {meta.detail && <p className="small" style={{ marginTop: 8 }}>{meta.detail}</p>}
             </div>
             <div className="grid-2">
