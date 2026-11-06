@@ -18,7 +18,7 @@ export default function Generate() {
   const [docs, setDocs] = useState([])
   useEffect(() => {
     db.all().then((i) => setCount(i.length)).catch(() => setCount(0))
-    db.docs().then(setDocs).catch(() => {})
+    db.docs().then((all) => setDocs(all.filter((d) => d.kind !== 'review'))).catch(() => {}) // the saved Review notes result isn't a document
   }, [])
   const choose = (id) => {
     setPathId(id)
