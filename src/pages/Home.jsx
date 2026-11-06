@@ -101,7 +101,7 @@ export default function Home() {
       <div className="section-title">Documents</div>
       <button className="list-item card" style={{ padding: 14 }} onClick={() => navigate('/generate')}>
         <span className="ico yellow"><Spark /></span>
-        <span className="meta"><span className="t">Generate with Claude</span><span className="s">DVRO, DV-101, exhibit list, advocate summary, criminal case, everything</span></span>
+        <span className="meta"><span className="t">Generate documents with Claude</span><span className="s">Restraining order request, description of abuse, exhibit list, advocate summary, criminal case packet, and more</span></span>
         <ChevR className="chev" />
       </button>
 
