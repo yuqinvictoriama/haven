@@ -67,7 +67,8 @@ input, textarea, select { font: inherit; color: inherit; }
 .topbar .title { flex: 1; font-weight: 650; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; min-width: 0; }
 .topbar .title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wordmark { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: -0.02em; }
-.wordmark .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 3px var(--purple-soft); }
+.wordmark .logo { width: 28px; height: 28px; object-fit: contain; flex: none; }
+.about-logo { display: block; width: 56px; height: 56px; margin: 4px auto 6px; object-fit: contain; opacity: 0.9; }
 .main { flex: 1; padding: 16px 16px calc(var(--tab-h) + env(safe-area-inset-bottom) + 24px); display: flex; flex-direction: column; gap: 14px; }
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
