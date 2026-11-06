@@ -15,6 +15,7 @@ const extraEntries = [
   { n: 15, date: '2026-11-04', text: "Marcus showed me the gun he keeps in the nightstand and said if I ever leave, I won't get far." },
   { n: 16, date: '2026-11-05', text: "Marcus took my debit card. He says I get $40 a week for gas and groceries and I have to give him every receipt." },
   { n: 17, date: '2026-11-06', text: "Marcus me dijo que si lo dejo, me mata. Lo dijo muy tranquilo." },
+  { n: 18, date: '2026-10-29', kind: 'photo', text: 'Placeholder photo (sample): bruises on my arm where Marcus grabbed it.' },
 ]
 const entries = [...sampleEntries, ...extraEntries]
 
@@ -50,7 +51,7 @@ if (result.status !== 200) {
   console.log(`Request failed (${result.status}):`, result.body)
   process.exit(1)
 }
-const { categories, safetyFlags, draft, legalLinks } = result.body
+const { categories, safetyFlags, summary, patterns, legalLinks } = result.body
 
 console.log(`\n #  | ${'expected'.padEnd(36)} | ${'got'.padEnd(72)} | ok | keyword match`)
 console.log(`----|-${'-'.repeat(36)}-|-${'-'.repeat(72)}-|----|--------------`)
@@ -69,12 +70,17 @@ console.log('\nlegalLinks:')
 for (const link of legalLinks) console.log(`  ${link.text}`)
 
 const realNumbers = new Set(entries.map((entry) => entry.n))
-const allCited = draft.every((sentence) => {
-  const match = sentence.trim().match(/\[Entry (\d+)\]$/)
-  return match !== null && realNumbers.has(Number(match[1]))
-})
+const pointsToRealEntries = (item) => item.entries.length > 0 && item.entries.every((n) => realNumbers.has(n))
+
+console.log('\nSummary:')
+for (const line of summary) console.log(`  ${line.text} (entries ${line.entries.join(', ')})`)
+console.log('\nPatterns over time:')
+for (const p of patterns) console.log(`  ${p.name} [${p.firstDate} → ${p.lastDate}; entries ${p.entries.join(', ')}]\n    ${p.description}`)
+
 console.log(`\n"illegal" anywhere in the response: ${/illegal/i.test(JSON.stringify(result.body)) ? 'YES ✗' : 'no ✓'}`)
-console.log(`Every draft sentence (${draft.length}) ends in a real [Entry N]: ${allCited ? 'yes ✓' : 'NO ✗'}`)
+console.log(`"draft" field gone: ${'draft' in result.body ? 'NO ✗' : 'yes ✓'}`)
+console.log(`Every summary line (${summary.length}) and pattern (${patterns.length}) points to real entries: ${[...summary, ...patterns].every(pointsToRealEntries) ? 'yes ✓' : 'NO ✗'}`)
+console.log(`At least 2 patterns found: ${patterns.length >= 2 ? 'yes ✓' : 'NO ✗'}`)
 
 function describe(labels, flagged) {
   return `${labels.length ? labels.join(', ') : 'no labels'}; ${flagged ? 'FLAG' : 'no flag'}`

@@ -5,9 +5,49 @@ import { sampleEntries } from '../data/sampleEntries.js'
 import { HOTLINE, DANGER_NOW, LEGAL_DISCLAIMER, SAFETY_CARD, NEXT_STEPS } from '../content/safetyText.js'
 import { navigate } from '../lib/router.js'
 import { Spark, Alert, Phone, Note } from '../components/Icons.jsx'
+import { CATEGORY_NAMES } from '../../data/categories.js'
 
-// Reviews dated notes with the collaborator's /api/analyze endpoint:
-// categories per entry, safety flags, and a first-person DV-100 draft.
+const KIND_LABEL = { note: 'Note', text: 'Text messages', log: 'Log', screenshot: 'Screenshot', photo: 'Photo', audio: 'Voice memo', video: 'Video', file: 'File' }
+
+// What Claude reads for each saved item: her own words for notes, texts and logs;
+// for photos, recordings and screenshots, the saved text, what Claude read from it, and her description.
+function entryText(item) {
+  const words = item.text?.trim() || ''
+  if (['note', 'text', 'log'].includes(item.kind)) return words
+  return [words, item.analysis?.summary?.trim(), item.notes?.trim()].filter(Boolean).join(' ')
+}
+
+// The calendar day in her own time zone (capturedAt is stored in UTC).
+function localDay(iso) {
+  const d = new Date(iso)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function entryRefs(numbers) {
+  return `${numbers.length === 1 ? 'Entry' : 'Entries'} ${numbers.join(', ')}`
+}
+
+function dateRange(first, last) {
+  if (!first) return ''
+  return first === last ? fmtDay(first + 'T12:00:00') : `${fmtDay(first + 'T12:00:00')} – ${fmtDay(last + 'T12:00:00')}`
+}
+
+// Built from the categories, not written by Claude: how many entries showed each kind of abuse each month.
+function monthByMonth(entries, categories) {
+  const months = new Map()
+  for (const entry of entries) {
+    const labels = categories?.find((c) => c.entry === entry.n)?.labels || []
+    if (!labels.length || !entry.date) continue
+    const month = entry.date.slice(0, 7)
+    const counts = months.get(month) || {}
+    for (const label of labels) counts[label] = (counts[label] || 0) + 1
+    months.set(month, counts)
+  }
+  return [...months.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
+}
+
+// Reviews all saved evidence with /api/analyze: categories per entry, safety flags,
+// a short summary, and the patterns over time that can be hard to see one day at a time.
 export default function Review() {
   const [entries, setEntries] = useState(null)
   const [sample, setSample] = useState(false)
@@ -17,8 +57,8 @@ export default function Review() {
 
   useEffect(() => {
     db.all().then((all) => {
-      const notes = all.filter((i) => ['note', 'text', 'log'].includes(i.kind) && i.text && i.text.trim()).sort((a, b) => (a.capturedAt < b.capturedAt ? -1 : 1))
-      setEntries(notes.map((it, i) => ({ n: i + 1, date: it.capturedAt.slice(0, 10), text: it.text.trim().slice(0, 4000), id: it.id })))
+      const usable = all.filter((it) => entryText(it)).sort((a, b) => (a.capturedAt < b.capturedAt ? -1 : 1))
+      setEntries(usable.map((it, i) => ({ n: i + 1, date: localDay(it.capturedAt), kind: it.kind, text: entryText(it).slice(0, 4000), id: it.id })))
     })
   }, [])
 
@@ -38,7 +78,7 @@ export default function Review() {
       const headers = { 'Content-Type': 'application/json' }
       const key = loadSettings().apiKey?.trim()
       if (key) headers['x-haven-key'] = key
-      const r = await fetch('/api/analyze', { method: 'POST', headers, body: JSON.stringify({ entries: entries.map(({ n, date, text }) => ({ n, date, text })) }) })
+      const r = await fetch('/api/analyze', { method: 'POST', headers, body: JSON.stringify({ entries: entries.map(({ n, date, kind, text }) => ({ n, date, kind: kind || 'note', text })) }) })
       const j = await r.json().catch(() => ({}))
       if (!r.ok) throw new Error(j.error || j.message || `Request failed (${r.status})`)
       setResult(j)
@@ -55,7 +95,7 @@ export default function Review() {
 
   return (
     <>
-      <div className="notice purple"><Spark />Claude reads your dated notes in order, tags each one (physical harm, threats, isolation and control, financial control), flags serious danger signs, and drafts what happened in your own words for a DV-100.</div>
+      <div className="notice purple"><Spark />Claude reads all your saved evidence in date order (notes, texts, screenshots, and the descriptions of your photos and recordings), tags each one, flags serious danger signs, and shows you the patterns over time that can be hard to see one day at a time.</div>
 
       {entries === null ? (
         <div className="empty"><span className="spinner" /></div>
@@ -83,7 +123,7 @@ export default function Review() {
                 <div key={e.n} className="list-item" style={{ cursor: 'default', alignItems: 'flex-start' }}>
                   <span className="badge purple" style={{ marginTop: 2 }}>{e.n}</span>
                   <span className="meta" style={{ whiteSpace: 'normal' }}>
-                    <span className="tiny">{fmtDay(e.date + 'T12:00:00')}</span>
+                    <span className="tiny">{fmtDay(e.date + 'T12:00:00')}{e.kind && e.kind !== 'note' ? ` · ${KIND_LABEL[e.kind] || e.kind}` : ''}</span>
                     <span style={{ display: 'block', fontSize: '0.9rem', whiteSpace: 'normal' }}>{e.text}</span>
                     {labels.length > 0 && <span className="chips" style={{ marginTop: 6 }}>{labels.map((l) => <span key={l} className="badge yellow">{l}</span>)}</span>}
                     {flag && <span className="notice danger" style={{ marginTop: 6, display: 'flex' }}><Alert />{flag.reason}</span>}
@@ -112,10 +152,44 @@ export default function Review() {
 
       {result && (
         <>
-          <div className="section-title">Draft in your words (DV-100)</div>
-          <div className="doc">
-            {result.draft?.length ? result.draft.map((s, i) => <p key={i}>{s}</p>) : <p className="muted">No relevant events were found in these entries.</p>}
-          </div>
+          {result.summary?.length > 0 && (
+            <>
+              <div className="section-title">Summary</div>
+              <div className="card">
+                {result.summary.map((line, i) => (
+                  <p key={i} className="small" style={{ margin: '0 0 8px' }}>{line.text} <span className="tiny muted">({entryRefs(line.entries)})</span></p>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="section-title">Patterns over time</div>
+          {result.patterns?.length ? (
+            result.patterns.map((pattern, i) => (
+              <div key={i} className="card">
+                <h3>{pattern.name}</h3>
+                <p className="small" style={{ margin: '6px 0' }}>{pattern.description}</p>
+                <div className="tiny muted">{[dateRange(pattern.firstDate, pattern.lastDate), entryRefs(pattern.entries)].filter(Boolean).join(' · ')}</div>
+              </div>
+            ))
+          ) : (
+            <p className="small muted">No repeated patterns were found in these entries.</p>
+          )}
+
+          {monthByMonth(entries, result.categories).length > 0 && (
+            <div className="card">
+              <h3>Month by month</h3>
+              <p className="tiny muted" style={{ margin: '4px 0 8px' }}>How many of your entries showed each kind of abuse, by month.</p>
+              {monthByMonth(entries, result.categories).map(([month, counts]) => (
+                <div key={month} style={{ margin: '8px 0' }}>
+                  <div className="small" style={{ fontWeight: 650 }}>{new Date(month + '-01T12:00:00').toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</div>
+                  <span className="chips" style={{ marginTop: 4 }}>
+                    {CATEGORY_NAMES.filter((label) => counts[label]).map((label) => <span key={label} className="badge yellow">{label} · {counts[label]}</span>)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
           {result.legalLinks?.length > 0 && (
             <div className="card">
               <h3>How this may relate to California law</h3>

@@ -18,12 +18,14 @@ Setup and workflow are in pipeline.md; rules are in CLAUDE.md. Every change goes
 
 ## The handoff between screens and Claude (agree on this first)
 `POST /api/analyze`
-- **Sends:** `{ entries: [{ n, date, text }] }`
+- **Sends:** `{ entries: [{ n, date, kind, text }] }`. `kind` is optional (note, text, log, screenshot, photo, audio, video, file). For media, `text` is the saved description or what Claude read from it. The Review screen sends all saved evidence.
 - **Gets back:**
   - `categories: [{ entry, labels }]`
   - `safetyFlags: [{ entry, reason }]`
-  - `draft: ["…first-person sentence. [Entry 9]", …]`
-  - `legalLinks: [{ category, subsections, text }]` (added later; new fields are only ever added, the ones above never change)
+  - `summary: [{ text, entries }]`: 2–4 calm sentences, each with the entries it is based on
+  - `patterns: [{ name, description, entries, firstDate, lastDate }]`: patterns over time; dates are filled in by code
+  - `legalLinks: [{ category, subsections, text }]`
+  - The old `draft` was removed (Nov 6), because the Documents page now drafts DV-100 and DV-101 from all evidence. Review notes is for seeing patterns over time. Summary lines and patterns that don't point to a real entry, or that say "illegal", are dropped in code.
 - **On failure:** `{ error: "friendly message" }`
 
 Categories: Physical harm · Threats & intimidation · Isolation & control · Financial control.

@@ -1,9 +1,13 @@
 // POST /api/analyze — sends the entries to Claude and returns the analysis.
 //
-// Request:  { entries: [{ n: 1, date: "2026-09-21", text: "..." }, ...] }
+// Request:  { entries: [{ n: 1, date: "2026-09-21", kind: "note", text: "..." }, ...] }
+//           kind is optional: note, text, log, screenshot, photo, audio, video, file.
+//           For photos, recordings and screenshots, text is the saved description or what was read from it.
 // Response: { categories:  [{ entry: 1, labels: ["Isolation & control"] }, ...],
 //             safetyFlags: [{ entry: 9, reason: "..." }, ...],
-//             draft:       ["On October 18, 2026, Marcus ... [Entry 9]", ...],
+//             summary:     [{ text: "Your notes describe ...", entries: [1, 5, 10] }, ...],
+//             patterns:    [{ name: "Watching your phone", description: "...", entries: [1, 5, 10],
+//                             firstDate: "2026-09-21", lastDate: "2026-10-25" }, ...],
 //             legalLinks:  [{ category: "Financial control", subsections: ["6320(c)(2)", "6320(c)(3)"],
 //                             text: "Financial control may be relevant to ..." }, ...] }
 // Error:    { error: "friendly message" }   (details go to the server log only)
@@ -47,11 +51,37 @@ const RESULT_SCHEMA = {
         additionalProperties: false,
       },
     },
-    draft: { type: 'array', items: { type: 'string' } },
+    summary: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          text: { type: 'string' },
+          entries: { type: 'array', items: { type: 'integer' } },
+        },
+        required: ['text', 'entries'],
+        additionalProperties: false,
+      },
+    },
+    patterns: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          description: { type: 'string' },
+          entries: { type: 'array', items: { type: 'integer' } },
+        },
+        required: ['name', 'description', 'entries'],
+        additionalProperties: false,
+      },
+    },
   },
-  required: ['categories', 'safetyFlags', 'draft'],
+  required: ['categories', 'safetyFlags', 'summary', 'patterns'],
   additionalProperties: false,
 }
+
+const KINDS = ['note', 'text', 'log', 'screenshot', 'photo', 'audio', 'video', 'file']
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -87,6 +117,7 @@ function readEntries(req) {
     .map((entry) => ({
       n: entry.n,
       date: typeof entry.date === 'string' ? entry.date : '',
+      kind: KINDS.includes(entry.kind) ? entry.kind : 'note',
       text: entry.text.trim(),
     }))
   return entries.length > 0 ? entries : null
@@ -117,36 +148,50 @@ async function analyzeEntries(entries) {
 
   const checked = removeIllegalWording(keepOnlyRealEntries(JSON.parse(text), entries))
   const safetyFlags = addKeywordFlags(checked.safetyFlags, entries)
-  return { ...checked, safetyFlags, legalLinks: buildLegalLinks(checked.categories) }
+  return {
+    ...checked,
+    safetyFlags,
+    patterns: addDateRanges(checked.patterns, entries),
+    legalLinks: buildLegalLinks(checked.categories),
+  }
 }
 
-// Never invent facts: drop anything that doesn't point to a real entry,
-// including any draft sentence that doesn't end in [Entry N].
+// Never invent facts: drop anything that doesn't point to a real entry.
+// Summary lines and patterns keep only real entry numbers, and are dropped if none are left.
 function keepOnlyRealEntries(result, entries) {
   const realNumbers = new Set(entries.map((entry) => entry.n))
-  const draft = result.draft.filter((sentence) => endsWithRealEntry(sentence, realNumbers))
-  if (draft.length < result.draft.length) {
-    console.warn(`Dropped ${result.draft.length - draft.length} draft sentence(s) without a real [Entry N].`)
+  const withRealEntries = (items, label) => {
+    const kept = items
+      .map((item) => ({ ...item, entries: [...new Set(item.entries.filter((n) => realNumbers.has(n)))].sort((a, b) => a - b) }))
+      .filter((item) => item.entries.length > 0)
+    if (kept.length < items.length) console.warn(`Dropped ${items.length - kept.length} ${label} without a real entry.`)
+    return kept
   }
   return {
     categories: result.categories.filter((item) => realNumbers.has(item.entry)),
     safetyFlags: result.safetyFlags.filter((flag) => realNumbers.has(flag.entry)),
-    draft,
+    summary: withRealEntries(result.summary, 'summary line(s)'),
+    patterns: withRealEntries(result.patterns, 'pattern(s)'),
   }
 }
 
-function endsWithRealEntry(sentence, realNumbers) {
-  const match = sentence.trim().match(/\[Entry (\d+)\]$/)
-  return match !== null && realNumbers.has(Number(match[1]))
+// Built in code, not by Claude: the first and latest date among a pattern's entries.
+function addDateRanges(patterns, entries) {
+  const dateOf = new Map(entries.map((entry) => [entry.n, entry.date]))
+  return patterns.map((pattern) => {
+    const dates = pattern.entries.map((n) => dateOf.get(n)).filter(Boolean).sort()
+    return { ...pattern, firstDate: dates[0] || '', lastDate: dates[dates.length - 1] || '' }
+  })
 }
 
-// Never say something "is illegal". Drop draft sentences that use the word
+// Never say something "is illegal". Drop summary lines and patterns that use the word
 // (or "illegally"). Keep every safety flag, but give it a calm generic reason.
 function removeIllegalWording(result) {
-  const draft = result.draft.filter((sentence) => !/illegal/i.test(sentence))
-  if (draft.length < result.draft.length) {
-    console.warn(`Dropped ${result.draft.length - draft.length} draft sentence(s) that said "illegal".`)
-  }
+  const saysIllegal = (value) => /illegal/i.test(value)
+  const summary = result.summary.filter((line) => !saysIllegal(line.text))
+  const patterns = result.patterns.filter((pattern) => !saysIllegal(pattern.name + ' ' + pattern.description))
+  const dropped = result.summary.length - summary.length + result.patterns.length - patterns.length
+  if (dropped > 0) console.warn(`Dropped ${dropped} summary line(s) or pattern(s) that said "illegal".`)
   let replaced = 0
   const safetyFlags = result.safetyFlags.map((flag) => {
     if (!/illegal/i.test(flag.reason)) return flag
@@ -154,7 +199,7 @@ function removeIllegalWording(result) {
     return { ...flag, reason: CALM_FLAG_REASON }
   })
   if (replaced > 0) console.warn(`Replaced ${replaced} safety flag reason(s) that said "illegal".`)
-  return { ...result, draft, safetyFlags }
+  return { ...result, summary, patterns, safetyFlags }
 }
 
 // Err toward safety: also flag any entry whose words match a danger sign in
