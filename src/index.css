@@ -243,7 +243,9 @@ audio { width: 100%; }
 .doc li { margin: 2px 0; }
 .doc blockquote { margin: 0 0 10px; padding: 6px 12px; border-left: 3px solid var(--purple); background: var(--purple-soft); border-radius: 0 8px 8px 0; color: var(--purple-ink); }
 .doc table { width: 100%; border-collapse: collapse; margin: 0 0 12px; font-size: 0.82rem; display: block; overflow-x: auto; }
-.doc th, .doc td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+.doc th, .doc td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; overflow-wrap: normal; min-width: 7.5em; }
+.doc th:first-child, .doc td:first-child { min-width: 3.5em; }
+.doc th:nth-child(4), .doc td:nth-child(4), .doc th:nth-child(5), .doc td:nth-child(5) { min-width: 13em; }
 .doc th { background: var(--surface-2); font-weight: 650; }
 .doc hr { border: 0; border-top: 1px solid var(--border); margin: 16px 0; }
 .doc code { font-family: var(--mono); font-size: 0.85em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
@@ -276,6 +278,8 @@ audio { width: 100%; }
   .topbar, .tabbar, .no-print { display: none !important; }
   .main { padding: 0; }
   .doc { border: 0; box-shadow: none; padding: 0; }
+  .doc table { display: table; }
+  .doc th, .doc td { min-width: 0; }
   body { background: #fff; color: #000; }
 }
 
