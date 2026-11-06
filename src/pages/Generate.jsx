@@ -27,7 +27,7 @@ export default function Generate() {
           return (
             <button key={d.kind} className="list-item" onClick={() => navigate(`/generate/${d.kind}`)} style={d.kind === 'everything' ? { background: 'var(--yellow-soft)' } : undefined}>
               <span className={'ico' + (d.kind === 'everything' ? ' yellow' : '')}><Icon /></span>
-              <span className="meta"><span className="t">{d.title}</span><span className="s" style={{ whiteSpace: 'normal' }}>{d.desc}</span></span>
+              <span className="meta"><span className="t">{d.title}</span><span className="s" style={{ whiteSpace: 'normal', marginTop: 2 }}>{d.desc}</span></span>
               <ChevR className="chev" />
             </button>
           )

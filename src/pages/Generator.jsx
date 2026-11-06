@@ -137,7 +137,11 @@ export default function Generator({ kind }) {
       {showForm && (
         <>
           <div className="card stack">
-            <div><h2>{meta.title}</h2><p className="muted small">{meta.desc}</p></div>
+            <div>
+              <h2>{meta.title}</h2>
+              <p className="muted small" style={{ marginTop: 4 }}>{meta.desc}</p>
+              {meta.detail && <p className="small" style={{ marginTop: 8 }}>{meta.detail}</p>}
+            </div>
             <div className="grid-2">
               <div className="field"><label>Your name</label><input className="input" value={profile.name} onChange={(e) => setProfile('name', e.target.value)} placeholder="As it should appear" /></div>
               <div className="field"><label>Person causing harm</label><input className="input" value={profile.respondent} onChange={(e) => setProfile('respondent', e.target.value)} placeholder="Name" /></div>
@@ -169,7 +173,7 @@ export default function Generator({ kind }) {
               </div>
             )}
           </div>
-          <button className="btn btn-primary btn-lg btn-block" onClick={run} disabled={running}><Spark /> Generate {kind === 'everything' ? 'everything' : 'with Claude'}</button>
+          <button className="btn btn-primary btn-lg btn-block" onClick={run} disabled={running}><Spark /> Generate {kind === 'everything' ? 'the complete packet' : 'with Claude'}</button>
           {claudeMode === 'demo' && <div className="tiny" style={{ textAlign: 'center' }}>Demo mode: a template is filled from your evidence. Add a key in More → Claude for a real draft.</div>}
           {kind === 'everything' && claudeMode !== 'demo' && <div className="tiny" style={{ textAlign: 'center' }}>Generates seven documents one after another. Takes a couple of minutes.</div>}
         </>
