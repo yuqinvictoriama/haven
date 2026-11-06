@@ -11,7 +11,8 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icon.svg'],
       manifest: {
         id: '/',
-        // Disguise: the installed app is a unit converter named "Convert" with a ruler icon.
+        // Disguise: only the home-screen identity (name + ruler icon) looks like a unit converter.
+        // Opening the app goes straight into Haven.
         name: 'Convert',
         short_name: 'Convert',
         description: 'Quick unit converter for length, weight, temperature, and volume.',
@@ -28,12 +29,11 @@ export default defineConfig({
           { src: '/pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
           { src: '/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
-        // Icon shortcuts must not give the app away, so they only open converter categories.
-        // Direct capture links (/capture?mode=audio&auto=1) still work from a Back Tap / Quick Tap shortcut.
+        // Long-press shortcuts (Android) open Haven's capture screens directly.
         shortcuts: [
-          { name: 'Length', short_name: 'Length', url: '/?c=length', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
-          { name: 'Weight', short_name: 'Weight', url: '/?c=weight', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
-          { name: 'Temperature', short_name: 'Temp', url: '/?c=temperature', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+          { name: 'Record audio', short_name: 'Record', url: '/capture?mode=audio&auto=1', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+          { name: 'Take photo', short_name: 'Photo', url: '/capture?mode=photo', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
+          { name: 'New note', short_name: 'Note', url: '/capture?mode=note', icons: [{ src: '/pwa-192.png', sizes: '192x192' }] },
         ],
         // Share text from another app (Android/Chrome) straight into Analyze.
         share_target: { action: '/share', method: 'GET', params: { title: 'title', text: 'text', url: 'url' } },

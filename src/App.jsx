@@ -1,11 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { useRoute, navigate, back, lock } from './lib/router.js'
+import { useRoute, navigate, back } from './lib/router.js'
 import { loadSettings, saveSettings } from './lib/db.js'
 import { health } from './lib/api.js'
 import { useShake } from './lib/shake.js'
 import { DOC_KINDS } from './lib/demo.js'
 import { Home as HomeIco, Folder, Mic, Doc, Cog, Exit, Back } from './components/Icons.jsx'
-import Converter from './pages/Converter.jsx'
 import Home from './pages/Home.jsx'
 import Capture from './pages/Capture.jsx'
 import Evidence from './pages/Evidence.jsx'
@@ -21,7 +20,7 @@ const AppCtx = createContext(null)
 export const useApp = () => useContext(AppCtx)
 
 const TABS = [
-  { to: '/home', label: 'Home', Icon: HomeIco, match: (p) => p === '/home' },
+  { to: '/', label: 'Home', Icon: HomeIco, match: (p) => p === '/' },
   { to: '/evidence', label: 'Evidence', Icon: Folder, match: (p) => p.startsWith('/evidence') },
   { to: '/capture', label: 'Capture', Icon: Mic, match: (p) => p.startsWith('/capture'), capture: true },
   { to: '/generate', label: 'Documents', Icon: Doc, match: (p) => p.startsWith('/generate') || p === '/next-steps' },
@@ -30,7 +29,7 @@ const TABS = [
 
 function titleFor(path, query) {
   const [root, sub] = path.split('/').filter(Boolean)
-  if (!root || root === 'home') return null
+  if (!root) return null
   if (root === 'capture') return 'Capture'
   if (root === 'evidence') return sub ? 'Evidence item' : 'Evidence'
   if (root === 'analyze' || root === 'share') return 'Analyze texts'
@@ -69,39 +68,25 @@ export default function App() {
     window.scrollTo(0, 0)
   }, [path])
 
-  // Shake only counts once the vault is open; on the converter it must do nothing.
-  useShake(settings.shake && path !== '/', () => {
+  useShake(settings.shake, () => {
     if (!path.startsWith('/capture')) navigate('/capture?mode=audio&auto=1')
   })
 
-  // Exit: straight back to the converter. Nothing to load, nothing in the address bar.
-  const quickExit = () => lock()
-
-  // Hold "=" on the converter. Shared text parked by the router opens in Analyze.
-  const unlock = () => {
-    let shared = null
+  const quickExit = () => {
     try {
-      shared = sessionStorage.getItem('haven.shared')
+      window.location.replace(settings.exitUrl || 'https://www.google.com')
     } catch {
-      /* storage unavailable */
+      window.location.href = 'https://www.google.com'
     }
-    navigate(shared ? '/analyze?shared=1' : '/home')
   }
 
   const claudeMode = status.claude ? 'live' : settings.apiKey?.trim() ? 'key' : 'demo'
   const ctx = { settings, setSettings, status, claudeMode, installEvt, setInstallEvt, quickExit }
 
   const [root, sub] = path.split('/').filter(Boolean)
-  if (!root) {
-    return (
-      <AppCtx.Provider value={ctx}>
-        <Converter onUnlock={unlock} initialCategory={query.get('c')} />
-      </AppCtx.Provider>
-    )
-  }
   let page
   switch (root) {
-    case 'home': page = <Home />; break
+    case undefined: page = <Home />; break
     case 'capture': page = <Capture />; break
     case 'evidence': page = sub ? <EvidenceDetail id={sub} /> : <Evidence />; break
     case 'analyze': page = <Analyze />; break
@@ -114,7 +99,7 @@ export default function App() {
   }
   const title = titleFor(path, query)
   const nested = !!sub || root === 'analyze' || root === 'share' || root === 'review' || root === 'next-steps'
-  const fallback = root === 'generate' || root === 'next-steps' ? '/generate' : root === 'evidence' ? '/evidence' : '/home'
+  const fallback = root === 'generate' || root === 'next-steps' ? '/generate' : root === 'evidence' ? '/evidence' : '/'
 
   return (
     <AppCtx.Provider value={ctx}>

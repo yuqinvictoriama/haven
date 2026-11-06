@@ -105,6 +105,7 @@ const defaults = {
   apiKey: '',
   shake: false,
   locationTag: false,
+  exitUrl: 'https://www.google.com',
   jurisdiction: 'California',
   profile: { name: '', respondent: '', relationship: '', children: '', notes: '' },
   installDismissed: false,

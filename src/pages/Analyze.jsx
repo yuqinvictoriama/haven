@@ -15,17 +15,7 @@ const SOURCES = [
 export default function Analyze({ shared = false }) {
   const { query } = useRoute()
   const { claudeMode } = useApp()
-  const [text, setText] = useState(() => {
-    if (!shared && query.get('shared') !== '1') return ''
-    try {
-      const raw = sessionStorage.getItem('haven.shared')
-      sessionStorage.removeItem('haven.shared')
-      const s = raw ? JSON.parse(raw) : {}
-      return [s.title, s.text, s.url].filter(Boolean).join('\n')
-    } catch {
-      return ''
-    }
-  })
+  const [text, setText] = useState(() => (shared ? [query.get('title'), query.get('text'), query.get('url')].filter(Boolean).join('\n') : ''))
   const [source, setSource] = useState('sms')
   const [context, setContext] = useState('')
   const [images, setImages] = useState([]) // { file, url }
@@ -37,7 +27,7 @@ export default function Analyze({ shared = false }) {
   const fileRef = useRef(null)
 
   useEffect(() => {
-    if (shared || query.get('shared') === '1') navigate('/analyze', { replace: true })
+    if (shared) navigate('/analyze', { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

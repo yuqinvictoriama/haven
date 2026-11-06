@@ -189,12 +189,12 @@ What a Capacitor (native shell) build would unlock:
 
 ## Safety notes
 
-Implemented disguise (added after the first draft of this spec): the installed app is named
-"Convert" with a ruler icon and is a working unit converter. Holding "=" for two seconds
-opens Haven; Exit returns to the converter; the address bar always shows "/". Manifest icon
-shortcuts open only converter categories so a long-press reveals nothing. Direct links such as
-`/capture?mode=audio&auto=1` still open the recorder for Back Tap / Quick Tap shortcuts and are
-rewritten to "/" on load, so the shortcut's URL is the only place the vault is visible.
+Implemented disguise (added after the first draft of this spec): only the home-screen identity
+is disguised. The installed app is named "Convert" with a ruler icon (manifest name, iOS
+home-screen title, tab title and favicon). Opening it goes straight into Haven; there is no
+converter screen inside the app. In system app pickers (Shortcuts "Open App", Quick Tap,
+RegiStar, Android Settings > Apps) the app appears as "Convert". The Android long-press
+shortcuts are Haven's Record audio / Take photo / New note, so a long-press does show them.
 
 
 - Name and icon: on iOS the user can rename the icon in the Add to Home Screen sheet

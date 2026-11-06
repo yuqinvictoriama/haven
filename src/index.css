@@ -278,13 +278,3 @@ audio { width: 100%; }
   .doc { border: 0; box-shadow: none; padding: 0; }
   body { background: #fff; color: #000; }
 }
-
-/* Converter (front door) */
-.conv { max-width: 480px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 24px); display: flex; flex-direction: column; gap: 14px; min-height: 100dvh; }
-.conv-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 6px; }
-.conv-brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; color: var(--text); }
-.conv-brand svg { color: var(--purple-ink); }
-.conv-row { display: grid; grid-template-columns: 1fr 1.1fr; gap: 10px; }
-.conv-num { font-size: 1.6rem; font-weight: 600; min-height: 60px; font-variant-numeric: tabular-nums; }
-.conv-out { display: flex; align-items: center; background: var(--surface-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.conv-eq { font-size: 1.8rem; font-weight: 700; min-height: 64px; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }

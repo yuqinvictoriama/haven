@@ -2,7 +2,7 @@
 
 Haven is an installable progressive web app for people experiencing domestic violence: capture evidence discreetly on a phone, keep it on the device, and turn it into the documents an advocate, a court, or the police need. Live at https://haven-app-ochre.vercel.app.
 
-**Disguise.** On the phone the app installs as **Convert**, a working unit converter with a ruler icon. Holding **=** for two seconds opens Haven; the Exit button returns to the converter. The web address is always `/`, so browser history and the address bar never show the vault. Icon shortcuts only open converter categories. Direct links such as `/capture?mode=audio&auto=1` still open the recorder (for Back Tap / Quick Tap shortcuts) and are then rewritten to `/`.
+**Disguise (home screen only).** On the phone the app installs as **Convert** with a ruler icon, so the home screen doesn't give it away. Opening it goes straight into Haven; there is no converter screen inside the app. The Exit button leaves for a neutral site (Google by default; changeable in Settings).
 
 ## What it does
 
@@ -20,9 +20,7 @@ Color scheme: muted yellow (`--yellow`) and light purple (`--purple`), light and
 
 | Path | What |
 |---|---|
-| `src/pages/Converter.jsx` | The front door: unit converter, hold = to unlock |
-| `src/lib/router.js` | In-memory router; the address stays `/` |
-| `src/App.jsx` | Shell: converter or vault, top bar with Exit, tab bar, settings context |
+| `src/App.jsx` | Shell: router, top bar with Exit, tab bar, settings context |
 | `src/pages/` | Home, Capture, Evidence, EvidenceDetail, Analyze, Generate, Generator, Settings |
 | `src/lib/db.js` | IndexedDB (evidence, documents) and localStorage settings |
 | `src/lib/api.js` | Client for `/api/parse` and streaming `/api/generate` |

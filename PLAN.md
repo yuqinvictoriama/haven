@@ -11,8 +11,8 @@ Setup and workflow are in pipeline.md; rules are in CLAUDE.md. Every change goes
 - and is merged when CI is green.
 
 ## How the app moves
-**Converter** → hold "=" for 2 s → **Vault** → Analyze → **Results**.
-- **Quick exit** (on Vault and Results) goes to a blank converter.
+**Home-screen icon "Convert" (ruler)** → opens straight into **Vault** → Analyze → **Results**. Only the home-screen icon and name are disguised; there is no converter screen inside the app.
+- **Quick exit** (on Vault and Results) leaves for a neutral site.
 - **Back** (on Results) goes to the vault.
 - The web address never changes, so browser history doesn't reveal the vault.
 
@@ -60,8 +60,8 @@ Categories: Physical harm · Threats & intimidation · Isolation & control · Fi
   *Check:* go through each CLAUDE.md "Product rules" line on the real screens.
 
 **Victoria: screens (suggested; she may already have her own)**
-- **Converter:** length units, a tap converts, holding "=" for 2 s opens the vault. The tab title and installed app name say "Unit Converter", not "Haven".
-  *Check:* 12 miles shows 19.31 km, and a quick tap never opens the vault.
+- **Home-screen disguise:** the installed app name and icon say "Convert" with a ruler, not "Haven". Opening it shows Haven's Home screen directly.
+  *Check:* install it on a phone; the home screen shows "Convert", and tapping it opens Haven.
 - **Vault:** the entries list, an add-entry box (dated today) saved in browser storage, Analyze, and Quick exit.
   *Check:* add an entry, reload, and it's still there.
 - **Results:**

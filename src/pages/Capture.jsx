@@ -343,7 +343,7 @@ function Photo() {
 function NoteEditor() {
   const [text, setText] = useState('')
   return (
-    <SaveForm kind="note" defaultTitle={`Note — ${fmtDate(new Date().toISOString())}`} text={text} onDiscard={() => navigate('/home')}>
+    <SaveForm kind="note" defaultTitle={`Note — ${fmtDate(new Date().toISOString())}`} text={text} onDiscard={() => navigate('/')}>
       <div className="field">
         <label>What happened?</label>
         <textarea className="textarea" autoFocus value={text} onChange={(e) => setText(e.target.value)} placeholder="Write it down while it is fresh: what was said or done, who was there, injuries, what time it started and ended." />
