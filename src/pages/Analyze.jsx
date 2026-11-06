@@ -83,8 +83,12 @@ export default function Analyze({ shared = false }) {
       await db.put(item)
       id = item.id
     }
-    for (const im of images) {
-      const item = newItem({ kind: 'screenshot', title: im.file.name.replace(/\.[^.]+$/, '') || 'Screenshot', capturedAt, mime: im.file.type, size: im.file.size, blob: im.file, source, analysis: text.trim() ? null : result, notes: context })
+    // Without pasted text, the analysis covers all screenshots together. Attach it to the first one only,
+    // so the same incidents are not counted (and cited) once per screenshot in reports.
+    for (const [i, im] of images.entries()) {
+      const holdsAnalysis = !text.trim() && i === 0
+      const notes = !text.trim() && i > 0 ? [context, 'Read together with the first screenshot'].filter(Boolean).join('. ') : context
+      const item = newItem({ kind: 'screenshot', title: im.file.name.replace(/\.[^.]+$/, '') || 'Screenshot', capturedAt, mime: im.file.type, size: im.file.size, blob: im.file, source, analysis: holdsAnalysis ? result : null, notes })
       await db.put(item)
       if (!id) id = item.id
     }
