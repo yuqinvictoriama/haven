@@ -29,7 +29,7 @@ Repo: https://github.com/yuqinvictoriama/haven
 ### 1. Connect Vercel (Victoria, about 2 minutes)
 1. Go to https://vercel.com/new and sign in **with GitHub**.
 2. Import `yuqinvictoriama/haven`. Vercel reads `vercel.json`, so keep the defaults and click **Deploy**.
-3. The live URL will be `https://haven-<something>.vercel.app`. Paste it here: **LIVE URL: _TBD_**
+3. The live URL will be `https://haven-<something>.vercel.app`. Paste it here: **LIVE URL: https://haven-app-ochre.vercel.app**
 4. (Optional) Project → Settings → Members: invite Lily so she can see logs and env vars. Deploys work without this because the repo is public.
 
 After this, Vercel deploys automatically. Nobody needs to run a deploy command.
