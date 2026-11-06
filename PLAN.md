@@ -53,7 +53,7 @@ Categories: Physical harm · Threats & intimidation · Isolation & control · Fi
   - `legalLinks` is built in code, not by Claude: "… may be relevant to California Family Code section …".
   - Any draft sentence with "illegal" is dropped; a flag reason with "illegal" gets a calm generic sentence instead.
   - `scripts/testAnalyze.js`: the 12 samples plus 5 extras (an ordinary argument, a throat squeeze, a gun threat, money control, a threat in Spanish).
-  - Follow-up: Lily pastes the verbatim law text (Fam. Code 6320(a) and (c)) from leginfo into `data/law6320.js`.
+  - `data/law6320.js`: Fam. Code 6320(a) and (c), word for word from leginfo (pasted by Lily). The prompt includes it as background only; it is never quoted or shown.
 
   *Check:* `node --env-file=.env.local scripts/testAnalyze.js` shows ✓ on every row with an expectation, no "illegal", and every draft sentence ends in a real [Entry N].
 - **5. Join-up with Victoria (25 min).** Connect her Analyze button to `/api/analyze` and do a full run on your phone.
