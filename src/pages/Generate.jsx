@@ -33,6 +33,13 @@ export default function Generate() {
           )
         })}
       </div>
+
+      <button className="list-item card" style={{ padding: 14 }} onClick={() => navigate('/next-steps')}>
+        <span className="ico"><Flag /></span>
+        <span className="meta"><span className="t">Next steps after you file</span><span className="s" style={{ whiteSpace: 'normal' }}>Court hearings, working with the prosecutor, and finding a free lawyer.</span></span>
+        <ChevR className="chev" />
+      </button>
+
       {docs.length > 0 && (
         <>
           <div className="section-title">Previous drafts</div>

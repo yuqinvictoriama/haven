@@ -15,6 +15,7 @@ import Generate from './pages/Generate.jsx'
 import Generator from './pages/Generator.jsx'
 import Settings from './pages/Settings.jsx'
 import Review from './pages/Review.jsx'
+import NextSteps from './pages/NextSteps.jsx'
 
 const AppCtx = createContext(null)
 export const useApp = () => useContext(AppCtx)
@@ -23,7 +24,7 @@ const TABS = [
   { to: '/home', label: 'Home', Icon: HomeIco, match: (p) => p === '/home' },
   { to: '/evidence', label: 'Evidence', Icon: Folder, match: (p) => p.startsWith('/evidence') },
   { to: '/capture', label: 'Capture', Icon: Mic, match: (p) => p.startsWith('/capture'), capture: true },
-  { to: '/generate', label: 'Documents', Icon: Doc, match: (p) => p.startsWith('/generate') },
+  { to: '/generate', label: 'Documents', Icon: Doc, match: (p) => p.startsWith('/generate') || p === '/next-steps' },
   { to: '/settings', label: 'More', Icon: Cog, match: (p) => p.startsWith('/settings') },
 ]
 
@@ -34,6 +35,7 @@ function titleFor(path, query) {
   if (root === 'evidence') return sub ? 'Evidence item' : 'Evidence'
   if (root === 'analyze' || root === 'share') return 'Analyze texts'
   if (root === 'review') return 'Review notes'
+  if (root === 'next-steps') return 'Next steps'
   if (root === 'generate') return sub ? DOC_KINDS.find((d) => d.kind === sub)?.title || 'Document' : 'Documents'
   if (root === 'settings') return query.get('section') || 'More'
   return 'Haven'
@@ -107,11 +109,12 @@ export default function App() {
     case 'review': page = <Review />; break
     case 'generate': page = sub ? <Generator kind={sub} /> : <Generate />; break
     case 'settings': page = <Settings />; break
+    case 'next-steps': page = <NextSteps />; break
     default: page = <Home />
   }
   const title = titleFor(path, query)
-  const nested = !!sub || root === 'analyze' || root === 'share' || root === 'review'
-  const fallback = root === 'generate' ? '/generate' : root === 'evidence' ? '/evidence' : '/home'
+  const nested = !!sub || root === 'analyze' || root === 'share' || root === 'review' || root === 'next-steps'
+  const fallback = root === 'generate' || root === 'next-steps' ? '/generate' : root === 'evidence' ? '/evidence' : '/home'
 
   return (
     <AppCtx.Provider value={ctx}>
