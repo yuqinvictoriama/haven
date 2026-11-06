@@ -3,16 +3,21 @@
 // Request:  { entries: [{ n: 1, date: "2026-09-21", text: "..." }, ...] }
 // Response: { categories:  [{ entry: 1, labels: ["Isolation & control"] }, ...],
 //             safetyFlags: [{ entry: 9, reason: "..." }, ...],
-//             draft:       ["On October 18, 2026, Marcus ... [Entry 9]", ...] }
+//             draft:       ["On October 18, 2026, Marcus ... [Entry 9]", ...],
+//             legalLinks:  [{ category: "Financial control", subsections: ["6320(c)(2)", "6320(c)(3)"],
+//                             text: "Financial control may be relevant to ..." }, ...] }
 // Error:    { error: "friendly message" }   (details go to the server log only)
 //
 // The API key (ANTHROPIC_API_KEY) is read here on the server and never sent to the browser.
 
 import Anthropic from '@anthropic-ai/sdk'
-import { CATEGORIES, SYSTEM_PROMPT, buildUserMessage } from '../prompts/analyze.js'
+import { SYSTEM_PROMPT, buildUserMessage } from '../prompts/analyze.js'
+import { CATEGORIES, CATEGORY_NAMES } from '../data/categories.js'
+import { findDangerSigns } from '../data/dangerSigns.js'
 
 const MAX_ENTRIES = 100
 const FRIENDLY_ERROR = "Sorry, we couldn't look over your entries right now. Please try again in a moment."
+const CALM_FLAG_REASON = 'You wrote about something that advocates treat as a serious danger sign.'
 
 // The exact JSON shape Claude must return (structured outputs).
 const RESULT_SCHEMA = {
@@ -24,7 +29,7 @@ const RESULT_SCHEMA = {
         type: 'object',
         properties: {
           entry: { type: 'integer' },
-          labels: { type: 'array', items: { type: 'string', enum: CATEGORIES } },
+          labels: { type: 'array', items: { type: 'string', enum: CATEGORY_NAMES } },
         },
         required: ['entry', 'labels'],
         additionalProperties: false,
@@ -110,7 +115,9 @@ async function analyzeEntries(entries) {
   const text = response.content.find((block) => block.type === 'text')?.text
   if (!text) throw new Error('Claude returned no text')
 
-  return keepOnlyRealEntries(JSON.parse(text), entries)
+  const checked = removeIllegalWording(keepOnlyRealEntries(JSON.parse(text), entries))
+  const safetyFlags = addKeywordFlags(checked.safetyFlags, entries)
+  return { ...checked, safetyFlags, legalLinks: buildLegalLinks(checked.categories) }
 }
 
 // Never invent facts: drop anything that doesn't point to a real entry,
@@ -131,4 +138,44 @@ function keepOnlyRealEntries(result, entries) {
 function endsWithRealEntry(sentence, realNumbers) {
   const match = sentence.trim().match(/\[Entry (\d+)\]$/)
   return match !== null && realNumbers.has(Number(match[1]))
+}
+
+// Never say something "is illegal". Drop draft sentences that use the word
+// (or "illegally"). Keep every safety flag, but give it a calm generic reason.
+function removeIllegalWording(result) {
+  const draft = result.draft.filter((sentence) => !/illegal/i.test(sentence))
+  if (draft.length < result.draft.length) {
+    console.warn(`Dropped ${result.draft.length - draft.length} draft sentence(s) that said "illegal".`)
+  }
+  let replaced = 0
+  const safetyFlags = result.safetyFlags.map((flag) => {
+    if (!/illegal/i.test(flag.reason)) return flag
+    replaced++
+    return { ...flag, reason: CALM_FLAG_REASON }
+  })
+  if (replaced > 0) console.warn(`Replaced ${replaced} safety flag reason(s) that said "illegal".`)
+  return { ...result, draft, safetyFlags }
+}
+
+// Err toward safety: also flag any entry whose words match a danger sign in
+// data/dangerSigns.js. This only adds flags; it never removes Claude's.
+function addKeywordFlags(safetyFlags, entries) {
+  const flagged = new Set(safetyFlags.map((flag) => flag.entry))
+  const added = entries
+    .filter((entry) => !flagged.has(entry.n))
+    .map((entry) => ({ entry: entry.n, signs: findDangerSigns(entry.text) }))
+    .filter((match) => match.signs.length > 0)
+    .map((match) => ({ entry: match.entry, reason: match.signs.map((sign) => sign.reason).join(' ') }))
+  if (added.length > 0) console.warn(`Added ${added.length} safety flag(s) from danger-sign keywords.`)
+  return [...safetyFlags, ...added]
+}
+
+// Built in code, not by Claude: one line per category found, in category order.
+function buildLegalLinks(categories) {
+  const found = new Set(categories.flatMap((item) => item.labels))
+  return CATEGORIES.filter((category) => found.has(category.name)).map((category) => ({
+    category: category.name,
+    subsections: category.subsections,
+    text: `${category.name} may be relevant to California Family Code section ${category.subsections.join(' and ')}.`,
+  }))
 }
