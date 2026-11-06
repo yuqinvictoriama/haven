@@ -59,14 +59,62 @@ export const DEMO_ANALYSIS = {
 }
 
 export const DOC_KINDS = [
-  { kind: 'dvro', title: 'DVRO request (DV-100)', short: 'DVRO', desc: 'Draft narrative answers for a Request for Domestic Violence Restraining Order.' },
-  { kind: 'dv101', title: 'DV-101 Description of Abuse', short: 'DV-101', desc: 'Incident-by-incident description: what happened, injuries, weapons, police, witnesses.' },
-  { kind: 'exhibit_list', title: 'Exhibit list', short: 'Exhibits', desc: 'Every piece of evidence over time, what it proves, and the patterns it shows.' },
-  { kind: 'advocate_summary', title: 'One-page advocate summary', short: 'Advocate', desc: 'Situation, safety concerns, timeline highlights, evidence, and asks on one page.' },
-  { kind: 'criminal_case', title: 'Criminal case packet', short: 'Criminal', desc: 'Statement for police or the DA, likely charges, elements supported by evidence.' },
-  { kind: 'timeline', title: 'Incident timeline', short: 'Timeline', desc: 'Chronological table of every incident with exhibit references.' },
-  { kind: 'safety_plan', title: 'Safety plan', short: 'Safety', desc: 'A personalized safety plan based on the risks identified.' },
-  { kind: 'everything', title: 'Everything', short: 'All', desc: 'The complete packet: summary, timeline, exhibits, DVRO, DV-101, criminal packet, safety plan.' },
+  {
+    kind: 'dvro',
+    title: 'Restraining Order Request',
+    short: 'DV-100',
+    desc: 'Draft answers for California form DV-100, the request for a Domestic Violence Restraining Order (DVRO).',
+    detail: 'A DVRO is the court order that tells the other person to stop contacting you, stay away from you, and in some cases move out or give up firearms. Form DV-100 asks what happened most recently, what happened before, and which orders you want. This draft fills in those answers from your evidence, in your words, so you can copy them onto the form with an advocate or at the court self-help center.',
+  },
+  {
+    kind: 'dv101',
+    title: 'Description of Abuse',
+    short: 'DV-101',
+    desc: 'Draft for California form DV-101, the attachment that describes each incident in detail.',
+    detail: 'Form DV-101 goes with DV-100 and gives the court a detailed account of each incident: the date, what was said or done, any injuries, weapons, police involvement, and witnesses. It lists the most recent incident first and cites the evidence that shows each one. Missing details are left as blanks for you to fill in, never guessed.',
+  },
+  {
+    kind: 'exhibit_list',
+    title: 'Exhibit List',
+    short: 'Exhibits',
+    desc: 'A numbered list of all your evidence over time, what each item shows, and the patterns across them.',
+    detail: 'Courts, advocates, and police refer to evidence by exhibit number. This list numbers every item you select, gives its date and type, and says what it demonstrates. It then describes the patterns over time, such as escalation and how often incidents happen, and notes what is still worth collecting.',
+  },
+  {
+    kind: 'advocate_summary',
+    title: 'Advocate Summary',
+    short: 'Summary',
+    desc: 'One page for a domestic violence advocate: your situation, safety concerns, key dates, evidence, and what you are asking for.',
+    detail: 'Advocates at shelters, hotlines, and court self-help centers often have limited time. This one-page summary gives them the situation, the safety concerns found in your evidence, a short timeline, a list of what evidence you have, what you want to happen next, and suggested next steps, so the first conversation can start from the facts.',
+  },
+  {
+    kind: 'criminal_case',
+    title: 'Criminal Case Packet',
+    short: 'Criminal',
+    desc: 'A statement and evidence index to hand to police or the District Attorney (DA), with the offenses they may consider.',
+    detail: 'If you report to the police or the DA, this packet gives them a short summary, an incident-by-incident statement in your words, an index of your evidence, and any witnesses. It lists offenses they may consider and which parts of your evidence may be relevant to each. Haven does not decide what is a crime; that is for police and prosecutors.',
+  },
+  {
+    kind: 'timeline',
+    title: 'Timeline',
+    short: 'Timeline',
+    desc: 'Every incident in date order, with the exhibit that shows each one.',
+    detail: 'A single table of every incident found in your evidence, oldest first, with the date, what happened, the type of abuse, and the exhibit number. It ends with a short note on how things changed over time. Useful on its own and as an attachment to any of the other documents.',
+  },
+  {
+    kind: 'safety_plan',
+    title: 'Safety Plan',
+    short: 'Safety',
+    desc: 'A personal plan for staying safer now, if you leave, and during the legal process, based on the risks found in your evidence.',
+    detail: 'A safety plan is a practical list for yourself: safest rooms and exits, a code word with someone you trust, what to pack, how to handle devices and location sharing, and who to call. This draft starts from the specific risks found in your evidence and includes the hotline. Review it with an advocate.',
+  },
+  {
+    kind: 'everything',
+    title: 'Complete Packet',
+    short: 'All',
+    desc: 'All seven documents in one file: advocate summary, timeline, exhibit list, restraining order request, description of abuse, criminal case packet, and safety plan.',
+    detail: 'Generates the seven documents above one after another and joins them into a single file with a table of contents. Takes a few minutes with Claude connected. Good for printing once and bringing to an advocate, the court, and the police.',
+  },
 ]
 
 const NOTE = '_This is not legal advice. Review with a court self-help center or advocate before filing._\n\n'
