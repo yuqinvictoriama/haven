@@ -66,10 +66,23 @@ export default function Settings() {
     <>
       <Hotline compact />
 
+      <div className="section-title">Disguise</div>
+      <div className="card stack">
+        <div className="row" style={{ gap: 10 }}>
+          <span style={{ width: 22, height: 22, color: 'var(--purple-ink)' }}><Shield /></span>
+          <span className="grow"><div style={{ fontWeight: 600 }}>This app looks like a unit converter</div><div className="tiny">On your home screen and in the app switcher it is called “Convert”, with a ruler icon, and it really converts units.</div></span>
+        </div>
+        <ol className="small muted" style={{ margin: 0, paddingLeft: 20, lineHeight: 1.6 }}>
+          <li>Open Convert and press and hold <b>=</b> for two seconds to get into Haven.</li>
+          <li>Tap <b>Exit</b> at any time to go back to the converter.</li>
+          <li>Your evidence stays on this phone either way. Only Analyze, Review, and Generate send text to Claude.</li>
+        </ol>
+      </div>
+
       <div className="section-title">Install</div>
       <div className="card">
         <div className="row between">
-          <span className="row" style={{ gap: 10 }}><Install style={{ width: 22, height: 22, color: 'var(--purple-ink)' }} /><span><div style={{ fontWeight: 600 }}>{installed ? 'Installed on this device' : 'Not installed yet'}</div><div className="tiny">{installed ? 'Haven opens full screen from your home screen.' : 'Install for one-tap access and shortcuts.'}</div></span></span>
+          <span className="row" style={{ gap: 10 }}><Install style={{ width: 22, height: 22, color: 'var(--purple-ink)' }} /><span><div style={{ fontWeight: 600 }}>{installed ? 'Installed on this device' : 'Not installed yet'}</div><div className="tiny">{installed ? 'Opens full screen from your home screen as “Convert”.' : 'Installs as “Convert” with a ruler icon.'}</div></span></span>
           {!installed && (installEvt ? <button className="btn btn-sm btn-primary" onClick={() => installEvt.prompt()}>Install</button> : null)}
         </div>
         {!installed && (
@@ -86,13 +99,13 @@ export default function Settings() {
         <Perm icon={<Pin />} label="Location" state={perm.geolocation} onAsk={askLoc} hint="Optional: tag where evidence was captured" />
         <Perm icon={<Wave />} label="Motion (shake to record)" state={perm.motion} onAsk={askMotion} hint={isIOS ? 'iPhone asks once per install' : 'Usually allowed automatically'} />
         {!supportsRecorder && <div className="notice warn" style={{ margin: '8px 0' }}><Alert />This browser cannot record in-app. Haven will use the system camera and recorder instead.</div>}
-        {isIOS && <div className="tiny" style={{ padding: '8px 0' }}>If something is blocked: iPhone Settings → Apps → Safari (or Haven, once installed) → Microphone / Camera.</div>}
+        {isIOS && <div className="tiny" style={{ padding: '8px 0' }}>If something is blocked: iPhone Settings → Apps → Safari (or Convert, once installed) → Microphone / Camera.</div>}
       </div>
 
       <div className="section-title">Capture gestures</div>
       <div className="card">
         <div className="toggle">
-          <span className="grow"><div style={{ fontWeight: 600 }}>Shake to start recording</div><div className="tiny">Shake the phone twice while Haven is open to start an audio recording.</div></span>
+          <span className="grow"><div style={{ fontWeight: 600 }}>Shake to start recording</div><div className="tiny">Shake the phone twice while Haven is unlocked to start an audio recording. Does nothing on the converter.</div></span>
           <button className={'switch' + (settings.shake ? ' on' : '')} onClick={toggleShake} role="switch" aria-checked={settings.shake} aria-label="Shake to record" />
         </div>
         <div className="toggle">
@@ -151,10 +164,10 @@ export default function Settings() {
 
       <div className="section-title">Safety</div>
       <div className="card stack">
-        <div className="field"><label className="row" style={{ gap: 6 }}><Exit style={{ width: 16, height: 16 }} /> Exit button goes to</label><input className="input" value={settings.exitUrl} onChange={(e) => setSettings({ exitUrl: e.target.value })} /></div>
+        <div className="notice"><Exit />The Exit button at the top of every screen returns to the converter instantly. The web address never changes, so browser history shows only “Convert”.</div>
         <div className="notice"><Shield />Everything you capture stays on this phone. Nothing is uploaded unless you tap Analyze or Generate (which sends that text to Claude) or Share.</div>
         <button className="btn btn-danger" onClick={() => setConfirmWipe(true)}><Trash /> Delete all Haven data on this phone</button>
-        <button className="btn btn-ghost btn-sm" onClick={() => { setSettings({ installDismissed: false }); navigate('/') }}>Show the install banner again</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => { setSettings({ installDismissed: false }); navigate('/home') }}>Show the install banner again</button>
       </div>
 
       <div className="tiny" style={{ textAlign: 'center', padding: '8px 0 20px' }}>Haven · prototype · not legal advice · {status.commit ? `build ${status.commit}` : ''}</div>
