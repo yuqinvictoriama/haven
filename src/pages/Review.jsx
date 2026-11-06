@@ -116,6 +116,13 @@ export default function Review() {
           <div className="doc">
             {result.draft?.length ? result.draft.map((s, i) => <p key={i}>{s}</p>) : <p className="muted">No relevant events were found in these entries.</p>}
           </div>
+          {result.legalLinks?.length > 0 && (
+            <div className="card">
+              <h3>How this may relate to California law</h3>
+              <ul style={{ margin: '8px 0 0', paddingLeft: 20 }} className="small">{result.legalLinks.map((l) => <li key={l.category} style={{ margin: '4px 0' }}>{l.text}</li>)}</ul>
+              <p className="tiny" style={{ margin: '8px 0 0' }}>{LEGAL_DISCLAIMER}</p>
+            </div>
+          )}
           <div className="card">
             <h3>{NEXT_STEPS.title}</h3>
             <ul style={{ margin: '8px 0 0', paddingLeft: 20 }} className="small">{NEXT_STEPS.items.map((t, i) => <li key={i} style={{ margin: '4px 0' }}>{t}</li>)}</ul>
