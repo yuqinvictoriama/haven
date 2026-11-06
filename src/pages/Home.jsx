@@ -2,19 +2,47 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../App.jsx'
 import { navigate } from '../lib/router.js'
 import { db } from '../lib/db.js'
+import { isSampleItem, loadSampleEvidence, removeSampleEvidence, withSampleProfile } from '../data/sampleEvidence.js'
 import { isStandalone, isIOS, fmtDate } from '../lib/media.js'
 import Hotline from '../components/Hotline.jsx'
 import Sheet from '../components/Sheet.jsx'
-import { Mic, Camera, Video, Note, Msg, Upload, Install, ChevR, Spark, kindIcon, X } from '../components/Icons.jsx'
+import { Mic, Camera, Video, Note, Msg, Upload, Install, ChevR, Spark, Alert, kindIcon, X } from '../components/Icons.jsx'
 
 export default function Home() {
   const { settings, setSettings, claudeMode, installEvt } = useApp()
   const [items, setItems] = useState([])
   const [showInstall, setShowInstall] = useState(false)
+  const [sampleBusy, setSampleBusy] = useState(false)
+  const [sampleMsg, setSampleMsg] = useState('')
+  const [sampleErr, setSampleErr] = useState('')
+  const refresh = () => db.all().then(setItems)
   useEffect(() => {
     db.all().then(setItems).catch(() => {})
   }, [])
   const incidents = items.reduce((n, i) => n + (i.analysis?.incidents?.length || 0), 0)
+  const hasSamples = items.some(isSampleItem)
+
+  const toggleSamples = async () => {
+    setSampleBusy(true)
+    setSampleMsg('')
+    setSampleErr('')
+    try {
+      if (hasSamples) {
+        const n = await removeSampleEvidence()
+        setSampleMsg(`Removed ${n} sample item${n === 1 ? '' : 's'}.`)
+      } else {
+        const n = await loadSampleEvidence()
+        setSettings((s) => ({ ...s, profile: withSampleProfile(s.profile) }))
+        setSampleMsg(`Added ${n} sample items.`)
+      }
+      await refresh()
+    } catch (e) {
+      console.error('Sample evidence failed', e)
+      setSampleErr('Sorry, the sample evidence could not be updated. Please try again.')
+    } finally {
+      setSampleBusy(false)
+    }
+  }
   const installed = isStandalone()
 
   const install = async () => {
@@ -96,6 +124,18 @@ export default function Home() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="card card-tight stack">
+        <div className="small muted">Serena and Marcus are made up. Use this to try Review notes and Documents.</div>
+        <div className="row">
+          <button className="btn btn-sm btn-secondary" disabled={sampleBusy} onClick={toggleSamples}>
+            {hasSamples ? 'Remove sample evidence' : 'Load sample evidence (made-up demo data)'}
+          </button>
+          {hasSamples && <button className="btn btn-sm btn-ghost" onClick={() => navigate('/evidence')}>View in Evidence</button>}
+        </div>
+        {sampleMsg && <div className="notice ok">{sampleMsg}</div>}
+        {sampleErr && <div className="notice danger"><Alert />{sampleErr}</div>}
       </div>
 
       <div className="section-title">Documents</div>
