@@ -94,8 +94,8 @@ export default function Home() {
       <div className="grid-2">
         <button className="action-tile" onClick={() => navigate('/analyze')}>
           <span className="ico yellow"><Msg /></span>
-          <span className="label">Paste texts</span>
-          <span className="desc">Claude finds incidents and patterns</span>
+          <span className="label">Add log</span>
+          <span className="desc">Type what happened or paste texts</span>
         </button>
         <button className="action-tile" onClick={() => navigate('/evidence?upload=1')}>
           <span className="ico"><Upload /></span>

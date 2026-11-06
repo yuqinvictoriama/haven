@@ -32,7 +32,7 @@ function titleFor(path, query) {
   if (!root) return null
   if (root === 'capture') return 'Capture'
   if (root === 'evidence') return sub ? 'Evidence item' : 'Evidence'
-  if (root === 'analyze' || root === 'share') return 'Analyze texts'
+  if (root === 'analyze' || root === 'share') return 'Add log'
   if (root === 'review') return 'Review notes'
   if (root === 'next-steps') return 'Next steps'
   if (root === 'generate') return sub ? DOC_KINDS.find((d) => d.kind === sub)?.title || 'Document' : 'Documents'
