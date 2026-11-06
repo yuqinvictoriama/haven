@@ -4,6 +4,7 @@ import { db } from '../lib/db.js'
 import { fmtDate } from '../lib/media.js'
 import { DOC_KINDS } from '../lib/demo.js'
 import { useApp } from '../App.jsx'
+import { LEGAL_DISCLAIMER } from '../content/safetyText.js'
 import { Doc, ChevR, Spark, Scale, List, Heart, Flag, Clock, Shield } from '../components/Icons.jsx'
 
 const ICONS = { dvro: Scale, dv101: Doc, exhibit_list: List, advocate_summary: Heart, criminal_case: Flag, timeline: Clock, safety_plan: Shield, everything: Spark }
@@ -18,7 +19,7 @@ export default function Generate() {
   }, [])
   return (
     <>
-      <div className="notice purple"><Spark />Claude drafts each document from your evidence and notes. Review every draft with an advocate or attorney before filing.</div>
+      <div className="notice purple"><Spark />Claude drafts each document from your evidence and notes, using only what you recorded. {LEGAL_DISCLAIMER}</div>
       {count === 0 && <div className="notice warn">No evidence yet. You can still generate templates, but add recordings, texts, or notes first for a useful draft.</div>}
       <div className="list">
         {DOC_KINDS.map((d) => {

@@ -6,6 +6,7 @@ Haven is an installable progressive web app for people experiencing domestic vio
 
 - **Capture**: audio and video recording, photos (in-app camera or system camera), and timestamped notes. Launch shortcuts start recording immediately: `/capture?mode=audio&auto=1`. Shake-to-record and OS gestures (iPhone Back Tap, Pixel Quick Tap, Samsung RegiStar) are documented in [EDGE-SPEC.md](EDGE-SPEC.md).
 - **Evidence vault**: upload texts, chat exports, call logs, screenshots, photos, recordings. Everything is stored in IndexedDB on the device, grouped by month, with notes, tags, dates, share and download.
+- **Review notes with Claude** (`/review`): dated notes go to `/api/analyze`, which tags each entry, flags danger signs, and drafts a first-person DV-100 description with `[Entry N]` citations. Sample entries included.
 - **Analyze with Claude** (`/analyze`): paste a message thread or attach screenshots; Claude returns incidents with verbatim quotes, dates, severity, patterns, risk flags, and suggested exhibits. Android share-target support (`/share`).
 - **Generate with Claude** (`/generate`): DVRO request narrative (DV-100), DV-101 Description of Abuse, exhibit list, one-page advocate summary, criminal case packet, incident timeline, safety plan, and "Everything". Drafts stream in, are saved on the device, and can be copied, shared, downloaded, or printed to PDF.
 - **Safety**: National Domestic Violence Hotline (call 1-800-799-7233, text START to 88788) on every main screen, an Exit button that leaves the site, no data leaves the phone except what you send to Claude or share, and one-tap delete-all.
@@ -20,7 +21,8 @@ Color scheme: muted yellow (`--yellow`) and light purple (`--purple`), light and
 | `src/App.jsx` | Shell: router, top bar with Exit, tab bar, settings context |
 | `src/pages/` | Home, Capture, Evidence, EvidenceDetail, Analyze, Generate, Generator, Settings |
 | `src/lib/db.js` | IndexedDB (evidence, documents) and localStorage settings |
-| `src/lib/api.js` | Client for `/api/analyze` and streaming `/api/generate` |
+| `src/lib/api.js` | Client for `/api/parse` and streaming `/api/generate` |
+| `src/pages/Review.jsx` | Client for `/api/analyze` (entries) with `src/content/safetyText.js` |
 | `src/lib/demo.js` | Sample thread, demo analysis, template documents |
 | `src/content/gestures.js` | Gesture setup guides shown in Settings |
 | `api/` | Vercel serverless functions (see below) |
@@ -44,8 +46,11 @@ Errors are JSON `{ error, message }`: `400 bad_request|bad_json`, `401 no_api_ke
 ### `GET /api/health`
 `{ ok, env, commit, time, claude }` — `claude` is true when `ANTHROPIC_API_KEY` is set on the server.
 
-### `POST /api/analyze`
-Parses pasted messages / logs / screenshots into structured evidence.
+### `POST /api/analyze` (entries)
+Reviews dated journal entries: `{ entries: [{ n, date, text }] }` → `{ categories, safetyFlags, draft }`. Prompt lives in `prompts/analyze.js`; used by the Review notes screen (`/review`). See the header comment in `api/analyze.js`.
+
+### `POST /api/parse`
+Parses pasted messages / logs / screenshots into structured evidence (used by the Analyze texts screen).
 
 ```jsonc
 // request

@@ -18,6 +18,7 @@ function headers() {
 async function readError(res) {
   let body = null
   try { body = await res.json() } catch { /* not json */ }
+  console.error('Haven API error', res.status, body)
   return new ApiError(res.status, body?.error || 'error', body?.message || `Request failed (${res.status})`)
 }
 

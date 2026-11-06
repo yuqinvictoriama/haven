@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRoute, navigate } from '../lib/router.js'
 import { db, newItem, kindForFile, KINDS } from '../lib/db.js'
 import { readText, fmtDate } from '../lib/media.js'
-import { Upload, Msg, ChevR, Folder, Alert, kindIcon } from '../components/Icons.jsx'
+import { Upload, Msg, ChevR, Folder, Alert, Spark, kindIcon } from '../components/Icons.jsx'
 
 export default function Evidence() {
   const { query } = useRoute()
@@ -74,6 +74,7 @@ export default function Evidence() {
       <div className="btn-row">
         <button className={'btn ' + (highlightUpload ? 'btn-primary' : 'btn-secondary')} onClick={() => fileRef.current?.click()} disabled={busy}><Upload /> {busy ? 'Adding…' : 'Upload files'}</button>
         <button className="btn btn-outline" onClick={() => navigate('/analyze')}><Msg /> Paste texts</button>
+        <button className="btn btn-outline" onClick={() => navigate('/review')}><Spark /> Review notes</button>
       </div>
       <input ref={fileRef} className="file-hidden" type="file" multiple accept="image/*,audio/*,video/*,text/*,.txt,.log,.csv,.json,.md,.eml,.pdf" onChange={onFiles} />
       {highlightUpload && <div className="notice purple">Screenshots, chat exports, call logs, photos, voice memos, and videos all work. Files keep their original date.</div>}

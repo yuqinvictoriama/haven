@@ -13,6 +13,7 @@ import Analyze from './pages/Analyze.jsx'
 import Generate from './pages/Generate.jsx'
 import Generator from './pages/Generator.jsx'
 import Settings from './pages/Settings.jsx'
+import Review from './pages/Review.jsx'
 
 const AppCtx = createContext(null)
 export const useApp = () => useContext(AppCtx)
@@ -31,6 +32,7 @@ function titleFor(path, query) {
   if (root === 'capture') return 'Capture'
   if (root === 'evidence') return sub ? 'Evidence item' : 'Evidence'
   if (root === 'analyze' || root === 'share') return 'Analyze texts'
+  if (root === 'review') return 'Review notes'
   if (root === 'generate') return sub ? DOC_KINDS.find((d) => d.kind === sub)?.title || 'Document' : 'Documents'
   if (root === 'settings') return query.get('section') || 'More'
   return 'Haven'
@@ -87,12 +89,13 @@ export default function App() {
     case 'evidence': page = sub ? <EvidenceDetail id={sub} /> : <Evidence />; break
     case 'analyze': page = <Analyze />; break
     case 'share': page = <Analyze shared />; break
+    case 'review': page = <Review />; break
     case 'generate': page = sub ? <Generator kind={sub} /> : <Generate />; break
     case 'settings': page = <Settings />; break
     default: page = <Home />
   }
   const title = titleFor(path, query)
-  const nested = !!sub || root === 'analyze' || root === 'share'
+  const nested = !!sub || root === 'analyze' || root === 'share' || root === 'review'
   const fallback = root === 'generate' ? '/generate' : root === 'evidence' ? '/evidence' : '/'
 
   return (

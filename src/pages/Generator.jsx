@@ -6,6 +6,7 @@ import { generate, isNoKey } from '../lib/api.js'
 import { DOC_KINDS, demoDocument } from '../lib/demo.js'
 import { renderMarkdown } from '../lib/markdown.js'
 import { useApp } from '../App.jsx'
+import { LEGAL_DISCLAIMER, NEXT_STEPS } from '../content/safetyText.js'
 import { Spark, Copy, Share, Download, Print, Alert, Stop, kindIcon } from '../components/Icons.jsx'
 
 const EVERYTHING = ['advocate_summary', 'timeline', 'exhibit_list', 'dvro', 'dv101', 'criminal_case', 'safety_plan']
@@ -188,6 +189,13 @@ export default function Generator({ kind }) {
             <div dangerouslySetInnerHTML={{ __html: renderMarkdown(doc) }} />
             {running && <span className="cursor" />}
           </div>
+          {!running && doc && (
+            <div className="card card-tight">
+              <div style={{ fontWeight: 650 }}>{NEXT_STEPS.title}</div>
+              <ul className="small" style={{ margin: '6px 0 6px', paddingLeft: 20 }}>{NEXT_STEPS.items.map((t, i) => <li key={i}>{t}</li>)}</ul>
+              <div className="tiny">{LEGAL_DISCLAIMER}</div>
+            </div>
+          )}
           <div className="btn-row no-print">
             {running ? (
               <button className="btn btn-danger" onClick={stop}><Stop /> Stop</button>
