@@ -75,6 +75,7 @@ On the PR:
 
 ## Secrets / environment variables
 - Never commit keys. `.env*` files are gitignored.
+- **`ANTHROPIC_API_KEY`** (Claude, used by `api/analyze.js` and `api/generate.js`) must be set in **Vercel → Project → Settings → Environment Variables** for Production + Preview, or with `npx vercel env add ANTHROPIC_API_KEY production` (then `preview`). Without it the API returns `401 no_api_key` and the app runs in demo mode.
 - Add secrets in **Vercel → Project → Settings → Environment Variables** (choose Production and/or Preview).
 - Read them only in `api/` code: `process.env.MY_KEY`. Anything under `src/` is shipped to browsers. Only `VITE_`-prefixed vars reach the front-end, and they're public.
 - Teammates get them locally with `npx vercel env pull .env.local`.
