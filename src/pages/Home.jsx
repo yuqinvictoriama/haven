@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../App.jsx'
 import { navigate } from '../lib/router.js'
-import { db } from '../lib/db.js'
+import { db, pinnedFirst } from '../lib/db.js'
 import { isSampleItem, loadSampleEvidence, removeSampleEvidence, withSampleProfile } from '../data/sampleEvidence.js'
 import { isStandalone, isIOS, fmtDate } from '../lib/media.js'
 import Hotline from '../components/Hotline.jsx'
@@ -113,9 +113,9 @@ export default function Home() {
           </div>
           <button className="btn btn-sm btn-secondary" onClick={() => navigate('/evidence')}>Open</button>
         </div>
-        {items.slice(0, 3).length > 0 && (
+        {items.length > 0 && (
           <div className="list" style={{ marginTop: 10 }}>
-            {items.slice(0, 3).map((it) => (
+            {pinnedFirst(items).slice(0, 3).map((it) => (
               <button key={it.id} className="list-item" onClick={() => navigate(`/evidence/${it.id}`)}>
                 <span className="ico">{kindIcon(it.kind)}</span>
                 <span className="meta"><span className="t">{it.title || '(untitled)'}</span><span className="s">{fmtDate(it.capturedAt)}</span></span>

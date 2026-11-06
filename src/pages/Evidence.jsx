@@ -133,9 +133,10 @@ export default function Evidence() {
 
   const kindsPresent = useMemo(() => Array.from(new Set((items || []).map((i) => i.kind))), [items])
   const visible = useMemo(() => (items || []).filter((i) => filter === 'all' || i.kind === filter), [items, filter])
+  const pinned = useMemo(() => visible.filter((i) => i.pinned), [visible])
   const groups = useMemo(() => {
     const g = []
-    for (const it of visible) {
+    for (const it of visible.filter((i) => !i.pinned)) {
       const key = new Date(it.capturedAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
       let grp = g[g.length - 1]
       if (!grp || grp.key !== key) {
@@ -148,6 +149,17 @@ export default function Evidence() {
     return g
   }, [visible])
   const incidents = (items || []).reduce((n, i) => n + (i.analysis?.incidents?.length || 0), 0)
+
+  const renderItem = (it) => (
+    <button key={it.id} className="list-item" onClick={() => navigate(`/evidence/${it.id}`)}>
+      <span className={'ico' + (['audio', 'video'].includes(it.kind) ? ' yellow' : '')}>{kindIcon(it.kind)}</span>
+      <span className="meta">
+        <span className="t">{it.title || '(untitled)'}</span>
+        <span className="s">{KINDS[it.kind]?.label || it.kind} · {fmtDate(it.capturedAt)}{it.analysis ? ` · ${it.analysis.incidents?.length || 0} incidents` : ''}</span>
+      </span>
+      <ChevR className="chev" />
+    </button>
+  )
 
   return (
     <>
@@ -187,23 +199,20 @@ export default function Evidence() {
           <div className="small">Record, photograph, write a note, paste texts, or upload files. Everything stays on this device.</div>
         </div>
       ) : (
-        groups.map((g) => (
-          <div key={g.key}>
-            <div className="month-head"><span className="m">{g.key}</span><span className="c">{g.items.length} item{g.items.length === 1 ? '' : 's'}{g.incidents ? ` · ${g.incidents} incidents` : ''}</span></div>
-            <div className="list">
-              {g.items.map((it) => (
-                <button key={it.id} className="list-item" onClick={() => navigate(`/evidence/${it.id}`)}>
-                  <span className={'ico' + (['audio', 'video'].includes(it.kind) ? ' yellow' : '')}>{kindIcon(it.kind)}</span>
-                  <span className="meta">
-                    <span className="t">{it.title || '(untitled)'}</span>
-                    <span className="s">{KINDS[it.kind]?.label || it.kind} · {fmtDate(it.capturedAt)}{it.analysis ? ` · ${it.analysis.incidents?.length || 0} incidents` : ''}</span>
-                  </span>
-                  <ChevR className="chev" />
-                </button>
-              ))}
+        <>
+          {pinned.length > 0 && (
+            <div>
+              <div className="month-head"><span className="m">Pinned</span><span className="c">{pinned.length} item{pinned.length === 1 ? '' : 's'}</span></div>
+              <div className="list">{pinned.map(renderItem)}</div>
             </div>
-          </div>
-        ))
+          )}
+          {groups.map((g) => (
+            <div key={g.key}>
+              <div className="month-head"><span className="m">{g.key}</span><span className="c">{g.items.length} item{g.items.length === 1 ? '' : 's'}{g.incidents ? ` · ${g.incidents} incidents` : ''}</span></div>
+              <div className="list">{g.items.map(renderItem)}</div>
+            </div>
+          ))}
+        </>
       )}
     </>
   )

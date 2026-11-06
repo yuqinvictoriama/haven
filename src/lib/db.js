@@ -65,6 +65,11 @@ export function kindForFile(file) {
   return 'file'
 }
 
+// Pinned items first, everything else in its existing order.
+export function pinnedFirst(items) {
+  return [...items.filter((i) => i.pinned), ...items.filter((i) => !i.pinned)]
+}
+
 export function newItem(partial) {
   const now = new Date().toISOString()
   return {

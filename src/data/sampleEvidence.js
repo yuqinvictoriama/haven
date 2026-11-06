@@ -3,6 +3,7 @@
 // images from public/sample (a text thread and a bruise) and two placeholders
 // (a photo and a voice memo) that match the entries.
 // Titles read like something Serena would write, with "(sample)" at the end.
+// The two real images are pinned so they sit at the top of Evidence for the demo.
 import { db, newItem } from '../lib/db.js'
 import { sampleEntries } from './sampleEntries.js'
 
@@ -26,6 +27,7 @@ const SAMPLE_MEDIA = [
   {
     kind: 'screenshot',
     file: 'texts.png',
+    pinned: true,
     date: '2026-10-26',
     time: '11:47:00',
     title: 'Texts from Marcus threatening to break my door (sample)',
@@ -47,6 +49,7 @@ const SAMPLE_MEDIA = [
   {
     kind: 'photo',
     file: 'bruise-on-arm.png',
+    pinned: true,
     date: '2026-10-29',
     time: '15:10:00',
     title: 'Photo of the bruise on my arm (sample)',
@@ -157,6 +160,7 @@ async function mediaItem(m) {
     tags: ['sample'],
     source: 'sample',
     durationSec: m.kind === 'audio' ? 1 : null,
+    pinned: !!m.pinned,
   })
 }
 
