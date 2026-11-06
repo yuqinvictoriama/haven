@@ -6,7 +6,7 @@ import { isSampleItem, loadSampleEvidence, removeSampleEvidence, withSampleProfi
 import { isStandalone, isIOS, fmtDate } from '../lib/media.js'
 import Hotline from '../components/Hotline.jsx'
 import Sheet from '../components/Sheet.jsx'
-import { Mic, Camera, Video, Note, Msg, Upload, Install, ChevR, Spark, Alert, kindIcon, X } from '../components/Icons.jsx'
+import { Mic, Camera, Video, Note, Install, ChevR, Spark, Alert, kindIcon, X } from '../components/Icons.jsx'
 
 export default function Home() {
   const { settings, setSettings, claudeMode, installEvt } = useApp()
@@ -89,18 +89,6 @@ export default function Home() {
           <span className="ico"><Note /></span>
           <span className="label">Write a note</span>
           <span className="desc">What happened, when</span>
-        </button>
-      </div>
-      <div className="grid-2">
-        <button className="action-tile" onClick={() => navigate('/analyze')}>
-          <span className="ico yellow"><Msg /></span>
-          <span className="label">Add log</span>
-          <span className="desc">Type what happened or paste texts</span>
-        </button>
-        <button className="action-tile" onClick={() => navigate('/evidence?upload=1')}>
-          <span className="ico"><Upload /></span>
-          <span className="label">Upload evidence</span>
-          <span className="desc">Screenshots, logs, photos, audio</span>
         </button>
       </div>
 
