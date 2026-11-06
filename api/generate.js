@@ -15,30 +15,55 @@ const MAX_TOTAL_TEXT = 300_000
 
 const DISCLAIMER = '*This is not legal advice. Review with a court self-help center or advocate before filing.*'
 
+// Shared by the DV-100 and DV-101 drafts: answer form questions only from the evidence.
+const FORM_ANSWER_RULES = `Form answer rules: answer each checkbox question as "Yes: ...", "No: ...", or "I don't know: ..." using ONLY what the evidence says, with the exhibit citation. If the evidence does not answer a question, write "[not in your evidence — add if you want]" instead of guessing (for example: witnesses, police, injuries, weapons, how it affected you). Every factual answer cites its exhibit, e.g. "(Exhibit 3, note, 2026-10-21)".`
+
 const SPECS = {
   dvro: {
-    title: 'DVRO Request — Draft Narrative (DV-100)',
-    spec: `Draft the narrative responses for a California Judicial Council form DV-100, "Request for Domestic Violence Restraining Order". Structure the document as the form items, in this order, each as a heading:
-1. Person asking for protection (name, relationship to the respondent, whether the address should stay confidential).
-2. Person you want protection from (name, description if known).
-3. Relationship (married/registered partners, dating, former partners, co-parents, family, living together).
-4. Other protected people (children, family members) and why.
-5. Orders requested: personal conduct orders; stay-away orders (home, work, school, vehicle, children's school; suggest a distance such as 100 yards); move-out order; no-contact (including through third parties and social media); child custody and visitation if relevant; firearms (state that the respondent must surrender firearms and ammunition; note any known access); record unlawful communications; property control; pets; other.
-6. Most recent abuse: date, what happened, injuries, weapons, police involvement, witnesses, and the evidence that supports each fact.
-7. Past abuse: each earlier incident, newest first, with evidence citations.
-8. Why the orders are needed now (fear, escalation, lethality indicators, what has already been tried).
-Write in first person as the person asking for protection. Quote threatening messages verbatim. Keep each item factual and specific.`,
+    title: 'DV-100 Request for Domestic Violence Restraining Order — Draft Answers',
+    spec: `Draft answers that mirror the official California Judicial Council form DV-100, "Request for Domestic Violence Restraining Order" (Rev. January 1, 2025), so the survivor can copy them onto the form.
+Right after the disclaimer line and the title, add this line exactly: "Copy these answers onto form DV-100 (Rev. January 1, 2025): https://courts.ca.gov/documents/dv100.pdf"
+Use these exact item numbers and headings, in this order, each as a level-2 heading "## N. Heading":
+1. Person Asking for Protection — a. Your full name; b. Your age; c. Address where you can receive court papers; d. Your contact information (optional); e. Your lawyer's information (if you have one). Use the profile; write "[fill in]" for anything missing.
+2. Person You Want Protection From — a. Full name; b. Age; c. Date of birth; d. Gender; e. Race. Use the profile; "[fill in]" for anything missing.
+3. Your Relationship to the Person in 2 — from the profile only (e.g. dating, married, living together, have a child together); "[fill in]" if missing.
+4. Other Restraining Orders and Court Cases — "[fill in]" unless the evidence mentions one.
+5. Most Recent Abuse — the most recent incident in the evidence. Answer each sub-item:
+   a. Date of abuse
+   b. Did anyone else hear or see what happened on this day? (I don't know / No / Yes — names)
+   c. Did the person in 2 use or threaten to use a gun or other weapon? (No / Yes — describe)
+   d. Did the person in 2 cause you any emotional or physical harm? (No / Yes — describe)
+   e. Did the police come? (I don't know / No / Yes)
+   f. Give more details about how the person in 2 was abusive on this day (what was said, done, or sent — texts, emails, pictures)
+   g. How often has the person in 2 abused you like this? (Just this once / 2–5 times / Weekly / Other) and list the dates from the evidence.
+6. Has the person in 2 abused you in a different way from the abuse you described in 5? — pick a different kind of abuse from the evidence and answer the same a–g.
+7. Is there other abuse by the person in 2 that you want the judge to know about? — another incident or kind of abuse from the evidence, same a–g. If more incidents remain, say "See DV-101 (item 32)".
+8. Other Protected People — children or household members from the profile; "[fill in]" if none listed.
+9. Does the person in 2 have firearms (guns), firearm parts, or ammunition? (I don't know / No / Yes — describe) — from the evidence only.
+10–31. Orders you can ask for — one short note that the survivor chooses these on the form themselves (Haven does not choose for them), then list the names only, as a plain bulleted list without checkmarks: 10 Order to Not Abuse; 11 No-Contact Order; 12 Stay-Away Order; 13 Order to Move Out; 14 Other Orders; 15 Child Custody and Visitation; 16 Protect Animals; 17 Control of Property; 18 Health Insurance; 19 Record Communications; 20 Property Restraint; 21 Extend Deadline to Give Notice; 22 Pay Debts (Bills) Owed for Property; 23 Pay Expenses Caused by the Abuse; 24 Child Support; 25 Spousal Support; 26 Rights to Mobile Device and Wireless Phone Account; 27 Batterer Intervention Program; 28 Lawyer's Fees and Costs; 29 No Firearms (Guns), Firearm Parts, or Ammunition; 30 No Body Armor; 31 Cannot Look for Protected People. Use the heading "## 10–31. Orders You Can Ask For".
+32. Additional Pages — if more space is needed for 5–7, use form DV-101 (Description of Abuse).
+33. Your Signature — "You sign the form yourself."
+Write answers in first person as the person asking for protection. Quote messages verbatim. Keep each answer short and factual.
+${FORM_ANSWER_RULES}`,
   },
   dv101: {
-    title: 'DV-101 Description of Abuse — Draft',
-    spec: `Draft the content of California Judicial Council form DV-101, "Description of Abuse", in first person. For EACH incident, newest first, use a heading with the date (or "[DATE]" if unknown) and then these labeled fields:
-- What happened (plain, specific, quote messages verbatim)
-- Injuries (or "None reported")
-- Weapons involved (or "None reported")
-- Police involvement / report number (or "None reported")
-- Witnesses (or "None known")
-- Evidence (cite exhibits)
-Then a short section "Pattern of abuse" summarizing how the incidents connect, and "Fear" stating in one or two sentences why the person is afraid now. Do not merge incidents.`,
+    title: 'DV-101 Description of Abuse — Draft Answers',
+    spec: `Draft answers that mirror the official California Judicial Council form DV-101, "Description of Abuse" (Rev. January 1, 2017), in first person, so the survivor can copy them onto the form.
+Right after the disclaimer line and the title, add this line exactly: "Copy these answers onto form DV-101 (Rev. January 1, 2017): https://courts.ca.gov/sites/default/files/courts/default/2024-11/dv101.pdf"
+Use these exact item numbers and headings, each as a level-2 heading "## N. Heading":
+1. Name of person asking for protection — from the profile; "[fill in]" if missing.
+2. Name of person you want protection from — from the profile; "[fill in]" if missing.
+3. Describe abuse to you or your children — the most recent incident in the evidence. Sub-items:
+   a. Date of abuse
+   b. Who was there?
+   c. Describe how the person in 2 abused you or your children (plain, specific; quote messages verbatim)
+   d. Describe any use or threatened use of guns or other weapons
+   e. Describe any injuries
+   f. Did the police or other law enforcement come? (Yes / No / I don't know) If yes: did they give you or the person in 2 an Emergency Protective Order? (Yes / No / I don't know)
+4. Has the person in 2 abused you (or your children) other times? — Yes, then each earlier incident from the evidence, newest first, as "### Incident: [date]" with the same a–f. Do not merge incidents.
+5. More space — "If you need more space, attach a sheet of paper and write 'DV-101—Description of Abuse' at the top."
+Do not add any section about feelings, fear, or why the survivor is afraid. At most, end with one line: "[In your own words, if you want: anything else you want the judge to know]".
+${FORM_ANSWER_RULES}`,
   },
   exhibit_list: {
     title: 'Exhibit List',
@@ -66,7 +91,8 @@ End with the hotline footer line.`,
 3. "Incident-by-incident statement" in first person, chronological, with quotes verbatim and exhibit citations.
 4. "Evidence index" (table: Exhibit | Date | Type | Description | Where stored).
 5. "Witnesses" (name/role/what they know, or "[none identified]").
-6. "Requested actions" (e.g. report number, Emergency Protective Order, firearm relinquishment, charging referral, victim advocate contact, Marsy's Law rights notice).`,
+6. "Requested actions" (e.g. report number, Emergency Protective Order, firearm relinquishment, charging referral, victim advocate contact, Marsy's Law rights notice).
+Keep the whole packet under about 1,600 words so it generates in time: one short line per element, and a brief incident statement that points to exhibits instead of repeating every detail.`,
   },
   safety_plan: {
     title: 'Personalized Safety Plan',
@@ -81,7 +107,8 @@ End with the hotline footer line.`,
 const EVERYTHING_ORDER = ['advocate_summary', 'timeline', 'exhibit_list', 'dvro', 'dv101', 'criminal_case', 'safety_plan']
 
 const KINDS = new Set([...Object.keys(SPECS), 'everything'])
-const EVIDENCE_KINDS = new Set(['text', 'log', 'photo', 'recording', 'audio', 'screenshot', 'note'])
+const EVIDENCE_KINDS = new Set(['text', 'log', 'photo', 'recording', 'audio', 'screenshot', 'video', 'file', 'note'])
+const MEDIA_KINDS = new Set(['photo', 'recording', 'audio', 'screenshot', 'video', 'file'])
 
 function systemPrompt(kind, jurisdiction) {
   const rules = `You are Haven's document drafter. Haven helps survivors of domestic violence turn their saved evidence into documents for advocates, courts, and police. Jurisdiction: ${jurisdiction}. Adapt form names and statutes to that jurisdiction when it is not California, and say so in one line.
@@ -91,6 +118,8 @@ Rules for every document:
 - Then a level-1 heading with the document title and the date "[DATE]" placeholder for signing.
 - Use the evidence as citations in parentheses, e.g. "(Exhibit 3, screenshot, 2026-03-02)". Exhibit numbers come from the evidence list you are given; do not renumber.
 - Never invent facts, dates, names, injuries, or events. Where a needed fact is missing, write a bracketed placeholder such as [NAME], [DATE], [ADDRESS], [POLICE REPORT #] and keep going.
+- Never add feelings, fears, injuries, motives, or details that the evidence does not contain. Do not write how the survivor felt, what they feared, or why something happened unless the evidence says it in their words. If a section asks for something the evidence does not contain (for example, why the survivor is afraid), leave a placeholder for their own words, such as "[In your own words: ...]".
+- Media items (photo, audio, video, screenshot, file) without a transcript are known only by the survivor's description; refer to them as "described as ..." and never describe what they show beyond that description.
 - Quote threatening or abusive messages verbatim, in quotation marks, exactly as written.
 - Trauma-informed, neutral, specific. Describe behavior, not character. Never blame the survivor.
 - No legal conclusions: never say that anything "is illegal" or that a crime was committed; at most say the facts "may be relevant to" a statute (for California, Family Code section 6320). No numeric risk scores, ratings, or predictions. Calm, plain, supportive tone.
@@ -135,8 +164,10 @@ function formatEvidence(evidence) {
       if (t.length > budget) t = t.slice(0, Math.max(0, budget)) + '\n[... truncated ...]'
       budget -= t.length
       lines.push(`Content:\n<content>\n${t}\n</content>`)
-    } else if (kind === 'audio' || kind === 'recording' || kind === 'photo') {
-      lines.push('Content: (media file; no transcript or description attached — cite it by exhibit number and the survivor\'s notes only)')
+    } else if (MEDIA_KINDS.has(kind)) {
+      // No transcript: give the model the survivor's own description, clearly marked as not a transcript.
+      const desc = e.notes ? String(e.notes).slice(0, 1000) : 'none given'
+      lines.push(`Content: (${kind} — description: ${desc}; not transcribed — cite it by exhibit number and this description only)`)
     }
     const a = e.analysis
     if (a && typeof a === 'object') {
